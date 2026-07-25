@@ -1,0 +1,52 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+artifacts/
+publish/
+*.appx
+*.msix
+*.msixbundle
+
+# Test and coverage output
+TestResults/
+coverage/
+coverage.*
+*.trx
+
+# IDEs and editors
+.vs/
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Windows and tooling
+Thumbs.db
+Desktop.ini
+*.tmp
+*.temp
+*.bak
+*.log
+*.dmp
+*.crash
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.snk
+*.cer
+*.key
+*.secrets.json
+
+# Package caches and generated reports
+packages/
+.nuget/
+.dotnet/
+BenchmarkDotNet.Artifacts/
