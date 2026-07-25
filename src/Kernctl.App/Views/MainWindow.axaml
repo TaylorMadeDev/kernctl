@@ -34,7 +34,7 @@
           <controls:LogoMark Width="28" Height="28" />
           <TextBlock
               VerticalAlignment="Center"
-              FontSize="17"
+              FontSize="{DynamicResource Font.Size.Brand}"
               FontWeight="Bold"
               Text="kernctl" />
         </StackPanel>
@@ -67,7 +67,7 @@
                 <TextBlock
                     Grid.Column="2"
                     VerticalAlignment="Center"
-                    FontSize="14"
+                    FontSize="{DynamicResource Font.Size.Navigation}"
                     FontWeight="Medium"
                     Text="{Binding Title}" />
               </Grid>
@@ -159,7 +159,7 @@
           VerticalAlignment="Center">
         <StackPanel Spacing="20">
           <StackPanel Spacing="5">
-            <TextBlock Classes="heading" FontSize="22" Text="Change profile" />
+            <TextBlock Classes="heading" FontSize="{DynamicResource Font.Size.DialogHeading}" Text="Change profile" />
             <TextBlock
                 Classes="body"
                 Text="Choose a session-only profile. This does not change Windows." />
@@ -203,6 +203,35 @@
                 Grid.Column="2"
                 Command="{Binding Gaming.ConfirmProfileCommand}"
                 Content="Use profile" />
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Border>
+
+    <Border
+        Grid.ColumnSpan="2"
+        Background="{DynamicResource Brush.Overlay}"
+        IsVisible="{Binding IsUnsavedNavigationDialogOpen}"
+        ZIndex="35">
+      <Border Classes="dialog" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Spacing="18">
+          <StackPanel Spacing="5">
+            <TextBlock Classes="heading" Text="Discard appearance changes?" />
+            <TextBlock
+                Classes="body"
+                Text="Your live preview has not been saved. Discarding restores the previously committed theme." />
+          </StackPanel>
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+            <Button
+                Grid.Column="1"
+                Classes="outline"
+                Command="{Binding KeepEditingThemeCommand}"
+                Content="Keep editing" />
+            <Button
+                Grid.Column="2"
+                Classes="danger"
+                Command="{Binding DiscardThemeChangesCommand}"
+                Content="Discard changes" />
           </Grid>
         </StackPanel>
       </Border>

@@ -1,0 +1,26 @@
+<UserControl
+    x:Class="Kernctl.App.Controls.ContrastWarning"
+    x:DataType="themes:ContrastWarningViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:themes="using:Kernctl.App.ViewModels.Themes">
+  <Border
+      Padding="10,8"
+      Background="{DynamicResource Brush.Warning.Subtle}"
+      BorderBrush="{DynamicResource Brush.Warning}"
+      BorderThickness="1"
+      CornerRadius="{DynamicResource Radius.Small}">
+    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+      <Ellipse
+          Width="7"
+          Height="7"
+          VerticalAlignment="Center"
+          Fill="{DynamicResource Brush.Warning}" />
+      <TextBlock
+          Grid.Column="1"
+          Classes="caption"
+          Foreground="{DynamicResource Brush.Text.Secondary}"
+          Text="{Binding Message}" />
+    </Grid>
+  </Border>
+</UserControl>

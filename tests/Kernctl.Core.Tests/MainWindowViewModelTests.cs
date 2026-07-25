@@ -1,7 +1,9 @@
+using Kernctl.App.Services;
 using Kernctl.App.ViewModels;
 using Kernctl.App.ViewModels.Pages;
 using Kernctl.Core.Models;
 using Kernctl.Core.Services;
+using Kernctl.Core.Themes;
 
 namespace Kernctl.Core.Tests;
 
@@ -60,12 +62,32 @@ public sealed class MainWindowViewModelTests
     {
         var profiles = new ProfileService();
         var gaming = new GamingPageViewModel(profiles, new TestMetricsService());
-        return new MainWindowViewModel(gaming);
+        var themeService = new ThemeService(
+            new ThemeStore(Path.Combine(Path.GetTempPath(), $"kernctl-tests-{Guid.NewGuid():N}")),
+            new TestThemeResourceSink());
+        themeService.InitializeAsync().GetAwaiter().GetResult();
+        var settings = new SettingsPageViewModel(themeService, new TestThemeFileDialogService());
+        return new MainWindowViewModel(gaming, settings, themeService);
     }
 
     private sealed class TestMetricsService : ISystemMetricsService
     {
         public ValueTask<SystemMetricsSnapshot> GetSnapshotAsync(CancellationToken cancellationToken) =>
             ValueTask.FromResult(new SystemMetricsSnapshot(1, 2, "Test", true, DateTimeOffset.UtcNow));
+    }
+
+    private sealed class TestThemeResourceSink : IThemeResourceSink
+    {
+        public void Apply(ThemeDefinition theme)
+        {
+        }
+    }
+
+    private sealed class TestThemeFileDialogService : IThemeFileDialogService
+    {
+        public Task<string?> PickImportPathAsync() => Task.FromResult<string?>(null);
+
+        public Task<string?> PickExportPathAsync(string suggestedFileName) =>
+            Task.FromResult<string?>(null);
     }
 }

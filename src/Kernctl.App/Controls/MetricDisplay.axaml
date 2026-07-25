@@ -13,7 +13,10 @@
         Source="{Binding Icon, RelativeSource={RelativeSource AncestorType=controls:MetricDisplay}}" />
     <StackPanel Grid.Column="1" Spacing="2">
       <TextBlock Classes="caption" Text="{Binding Label, RelativeSource={RelativeSource AncestorType=controls:MetricDisplay}}" />
-      <TextBlock FontSize="17" FontWeight="SemiBold" Text="{Binding Value, RelativeSource={RelativeSource AncestorType=controls:MetricDisplay}}" />
+      <TextBlock
+          FontSize="{DynamicResource Font.Size.Profile}"
+          FontWeight="SemiBold"
+          Text="{Binding Value, RelativeSource={RelativeSource AncestorType=controls:MetricDisplay}}" />
     </StackPanel>
   </Grid>
 </UserControl>

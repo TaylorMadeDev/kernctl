@@ -37,6 +37,7 @@ public sealed partial class MainWindow : Window, IDisposable
 
     private void OnClosed(object? sender, EventArgs eventArgs)
     {
+        ViewModel?.CancelThemePreviewOnExit();
         lifetimeCancellation.Cancel();
         Dispose();
     }
@@ -86,6 +87,24 @@ public sealed partial class MainWindow : Window, IDisposable
 
     private void Window_KeyDown(object? sender, KeyEventArgs eventArgs)
     {
+        if (eventArgs.Key == Key.S
+            && eventArgs.KeyModifiers.HasFlag(KeyModifiers.Control)
+            && ViewModel?.SelectedNavigation.Title == "Settings")
+        {
+            ViewModel.Settings.Appearance.SaveCommand.Execute(null);
+            eventArgs.Handled = true;
+            return;
+        }
+
+        if (eventArgs.Key == Key.Escape
+            && ViewModel?.SelectedNavigation.Title == "Settings"
+            && ViewModel.Settings.Appearance.IsDirty)
+        {
+            ViewModel.RequestAppearanceCancel();
+            eventArgs.Handled = true;
+            return;
+        }
+
         if (eventArgs.Key == Key.K
             && eventArgs.KeyModifiers.HasFlag(KeyModifiers.Control))
         {

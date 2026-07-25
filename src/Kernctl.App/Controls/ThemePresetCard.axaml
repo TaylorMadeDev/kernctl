@@ -1,0 +1,33 @@
+<UserControl
+    x:Class="Kernctl.App.Controls.ThemePresetCard"
+    x:DataType="themes:ThemePresetViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:themes="using:Kernctl.App.ViewModels.Themes">
+  <Border
+      MinWidth="112"
+      Padding="12"
+      Background="{DynamicResource Brush.Surface.Primary}"
+      BorderBrush="{DynamicResource Brush.Border.Subtle}"
+      BorderThickness="1"
+      CornerRadius="{DynamicResource Radius.Medium}">
+    <StackPanel Spacing="9">
+      <Grid Height="34" ColumnDefinitions="*,*,*">
+        <Border Background="{Binding Background}" CornerRadius="{DynamicResource Radius.Small}" />
+        <Border Grid.Column="1" Background="{Binding Surface}" />
+        <Border
+            Grid.Column="2"
+            Background="{Binding Accent}"
+            CornerRadius="{DynamicResource Radius.Small}" />
+      </Grid>
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Classes="label" Text="{Binding Name}" />
+        <TextBlock
+            Grid.Column="1"
+            Classes="caption"
+            Text="Built-in"
+            IsVisible="{Binding IsBuiltIn}" />
+      </Grid>
+    </StackPanel>
+  </Border>
+</UserControl>

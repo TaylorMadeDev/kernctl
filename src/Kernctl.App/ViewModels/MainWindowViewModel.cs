@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Kernctl.App.Services;
 using Kernctl.App.ViewModels.Pages;
 
@@ -14,10 +15,19 @@ public sealed class MainWindowViewModel : ObservableObject
     private string searchQuery = string.Empty;
     private bool isSearchEngaged;
     private SearchResultViewModel? selectedSearchResult;
+    private NavigationItemViewModel? pendingNavigation;
+    private bool isUnsavedNavigationDialogOpen;
 
-    public MainWindowViewModel(GamingPageViewModel gaming)
+    public MainWindowViewModel(
+        GamingPageViewModel gaming,
+        SettingsPageViewModel settings,
+        IThemeService themeService)
     {
         Gaming = gaming;
+        Settings = settings;
+        ThemeService = themeService;
+        DiscardThemeChangesCommand = new RelayCommand(DiscardThemeChanges);
+        KeepEditingThemeCommand = new RelayCommand(KeepEditingTheme);
 
         NavigationItems =
         [
@@ -53,10 +63,7 @@ public sealed class MainWindowViewModel : ObservableObject
                 "Apps",
                 "Application inventory and management are not implemented yet.",
                 IconCatalog.Apps),
-            ["Settings"] = new PlaceholderPageViewModel(
-                "Settings",
-                "kernctl settings are not implemented yet.",
-                IconCatalog.Settings),
+            ["Settings"] = Settings,
         };
 
         selectedNavigation = NavigationItems.Single(item => item.Title == "Gaming");
@@ -81,7 +88,15 @@ public sealed class MainWindowViewModel : ObservableObject
 
     public GamingPageViewModel Gaming { get; }
 
+    public SettingsPageViewModel Settings { get; }
+
+    public IThemeService ThemeService { get; }
+
     public ObservableCollection<SearchResultViewModel> SearchResults { get; } = [];
+
+    public IRelayCommand DiscardThemeChangesCommand { get; }
+
+    public IRelayCommand KeepEditingThemeCommand { get; }
 
     public NavigationItemViewModel SelectedNavigation
     {
@@ -89,9 +104,28 @@ public sealed class MainWindowViewModel : ObservableObject
         set
         {
             ArgumentNullException.ThrowIfNull(value);
+            if (value == selectedNavigation)
+            {
+                return;
+            }
+
+            if (selectedNavigation.Title == "Settings"
+                && value.Title != "Settings"
+                && Settings.Appearance.IsDirty)
+            {
+                pendingNavigation = value;
+                IsUnsavedNavigationDialogOpen = true;
+                OnPropertyChanged();
+                return;
+            }
+
             if (SetProperty(ref selectedNavigation, value))
             {
                 CurrentPage = pages[value.Title];
+                if (value.Title == "Settings")
+                {
+                    Settings.Appearance.BeginPreviewSession();
+                }
             }
         }
     }
@@ -121,6 +155,12 @@ public sealed class MainWindowViewModel : ObservableObject
     }
 
     public bool IsSearchOpen => isSearchEngaged && SearchResults.Count > 0;
+
+    public bool IsUnsavedNavigationDialogOpen
+    {
+        get => isUnsavedNavigationDialogOpen;
+        private set => SetProperty(ref isUnsavedNavigationDialogOpen, value);
+    }
 
     public async Task InitializeAsync(CancellationToken cancellationToken) =>
         await Gaming.InitializeAsync(cancellationToken);
@@ -172,6 +212,19 @@ public sealed class MainWindowViewModel : ObservableObject
         SelectedNavigation = destination;
     }
 
+    public void RequestAppearanceCancel()
+    {
+        if (!Settings.Appearance.IsDirty)
+        {
+            return;
+        }
+
+        pendingNavigation = null;
+        IsUnsavedNavigationDialogOpen = true;
+    }
+
+    public void CancelThemePreviewOnExit() => ThemeService.CancelPreview();
+
     private void RefreshSearchResults()
     {
         SearchResults.Clear();
@@ -190,5 +243,26 @@ public sealed class MainWindowViewModel : ObservableObject
 
         SelectedSearchResult = SearchResults.FirstOrDefault();
         OnPropertyChanged(nameof(IsSearchOpen));
+    }
+
+    private void DiscardThemeChanges()
+    {
+        Settings.Appearance.RequestCancel();
+        IsUnsavedNavigationDialogOpen = false;
+        if (pendingNavigation is not null)
+        {
+            var destination = pendingNavigation;
+            pendingNavigation = null;
+            selectedNavigation = destination;
+            OnPropertyChanged(nameof(SelectedNavigation));
+            CurrentPage = pages[destination.Title];
+        }
+    }
+
+    private void KeepEditingTheme()
+    {
+        pendingNavigation = null;
+        IsUnsavedNavigationDialogOpen = false;
+        OnPropertyChanged(nameof(SelectedNavigation));
     }
 }

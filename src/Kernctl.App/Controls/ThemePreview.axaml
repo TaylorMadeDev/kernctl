@@ -1,0 +1,87 @@
+<UserControl
+    x:Class="Kernctl.App.Controls.ThemePreview"
+    x:DataType="themes:ThemePreviewViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Kernctl.App.Controls"
+    xmlns:services="using:Kernctl.App.Services"
+    xmlns:themes="using:Kernctl.App.ViewModels.Themes">
+  <Border
+      Padding="{DynamicResource Card.Padding}"
+      Background="{DynamicResource Brush.Surface.Elevated}"
+      BorderBrush="{DynamicResource Brush.Border.Subtle}"
+      BorderThickness="1"
+      CornerRadius="{DynamicResource Radius.Large}">
+    <StackPanel Spacing="16">
+      <StackPanel Spacing="3">
+        <TextBlock Classes="heading" Text="Live preview" />
+        <TextBlock Classes="body" Text="Real kernctl controls using active resources" />
+      </StackPanel>
+
+      <Border
+          Padding="10"
+          Background="{DynamicResource Brush.Sidebar}"
+          CornerRadius="{DynamicResource Radius.Medium}">
+        <StackPanel Spacing="5">
+          <Border Padding="9,7" CornerRadius="{DynamicResource Radius.Small}">
+            <TextBlock Classes="body" Text="Overview" />
+          </Border>
+          <Border
+              Padding="9,7"
+              Background="{DynamicResource Brush.Selection}"
+              CornerRadius="{DynamicResource Radius.Small}">
+            <TextBlock Classes="label" Text="Appearance" />
+          </Border>
+        </StackPanel>
+      </Border>
+
+      <controls:ToolCard DataContext="{Binding PreviewTool}" />
+
+      <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="10">
+        <TextBlock Classes="body" Text="Theme toggle" />
+        <ToggleSwitch Grid.Column="1" Classes="kernctl" IsChecked="True" />
+        <TextBlock Grid.Row="1" Classes="body" Text="Disabled toggle" />
+        <ToggleSwitch Grid.Row="1" Grid.Column="1" Classes="kernctl" IsChecked="False" IsEnabled="False" />
+      </Grid>
+
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+        <Button Content="Primary button" />
+        <Button Grid.Column="1" Classes="outline" Content="Outlined" />
+      </Grid>
+
+      <Grid>
+        <TextBox Classes="search" Text="Search tools" />
+        <controls:SvgIcon
+            Width="16"
+            Height="16"
+            Margin="13,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            IsHitTestVisible="False"
+            IconBrush="{DynamicResource Brush.Text.Secondary}"
+            Source="{x:Static services:IconCatalog.Search}" />
+      </Grid>
+
+      <Border
+          Padding="14"
+          Background="{DynamicResource Brush.Surface.Primary}"
+          BorderBrush="{DynamicResource Brush.Border.Subtle}"
+          BorderThickness="1"
+          CornerRadius="{DynamicResource Radius.Medium}">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="label" Text="Balanced" />
+            <TextBlock Classes="caption" Text="Profile preview" />
+          </StackPanel>
+          <TextBlock Grid.Column="1" VerticalAlignment="Center" Classes="label" Text="CPU 18%" />
+        </Grid>
+      </Border>
+
+      <WrapPanel Orientation="Horizontal">
+        <Border Classes="status success"><TextBlock Classes="caption" Text="Success" /></Border>
+        <Border Classes="status warning"><TextBlock Classes="caption" Text="Warning" /></Border>
+        <Border Classes="status danger"><TextBlock Classes="caption" Text="Error" /></Border>
+      </WrapPanel>
+    </StackPanel>
+  </Border>
+</UserControl>

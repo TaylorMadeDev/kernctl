@@ -16,8 +16,8 @@
           IconBrush="{DynamicResource Brush.Accent}"
           Source="{Binding Icon}" />
       <StackPanel Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center" Spacing="4">
-        <TextBlock Classes="heading" FontSize="15" Text="{Binding Title}" />
-        <TextBlock Classes="body" FontSize="12.5" Text="{Binding Description}" />
+        <TextBlock Classes="heading" FontSize="{DynamicResource Font.Size.ToolHeading}" Text="{Binding Title}" />
+        <TextBlock Classes="body" FontSize="{DynamicResource Font.Size.ToolBody}" Text="{Binding Description}" />
       </StackPanel>
       <ToggleSwitch
           Grid.Column="2"

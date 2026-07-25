@@ -1,11 +1,13 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Kernctl.App.Services;
 using Kernctl.App.ViewModels;
 using Kernctl.App.ViewModels.Pages;
 using Kernctl.App.Views;
 using Kernctl.Core.Actions;
 using Kernctl.Core.Services;
+using Kernctl.Core.Themes;
 using Kernctl.Platform.Windows;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,6 +26,11 @@ public sealed partial class App : Application
             var services = new ServiceCollection();
             ConfigureServices(services);
             serviceProvider = services.BuildServiceProvider();
+            serviceProvider
+                .GetRequiredService<IThemeService>()
+                .InitializeAsync()
+                .GetAwaiter()
+                .GetResult();
 
             desktop.MainWindow = new MainWindow
             {
@@ -41,7 +48,14 @@ public sealed partial class App : Application
         services.AddSingleton<IProfileService, ProfileService>();
         services.AddSingleton<ISystemMetricsService, DevelopmentSystemMetricsService>();
         services.AddSingleton<ITransactionalActionEngine, TransactionalActionEngine>();
+        services.AddSingleton(_ => new ThemeStore(Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "kernctl")));
+        services.AddSingleton<IThemeResourceSink, AvaloniaThemeResourceSink>();
+        services.AddSingleton<IThemeService, ThemeService>();
+        services.AddSingleton<IThemeFileDialogService, ThemeFileDialogService>();
         services.AddSingleton<GamingPageViewModel>();
+        services.AddSingleton<SettingsPageViewModel>();
         services.AddSingleton<MainWindowViewModel>();
     }
 }

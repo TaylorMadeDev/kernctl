@@ -15,6 +15,7 @@
 
   <Application.Styles>
     <SimpleTheme />
+    <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Simple/Simple.xaml" />
     <StyleInclude Source="/Styles/Controls.axaml" />
   </Application.Styles>
 
@@ -24,6 +25,9 @@
     </DataTemplate>
     <DataTemplate DataType="pages:PlaceholderPageViewModel">
       <views:PlaceholderPage />
+    </DataTemplate>
+    <DataTemplate DataType="pages:SettingsPageViewModel">
+      <views:SettingsPage />
     </DataTemplate>
   </Application.DataTemplates>
 </Application>

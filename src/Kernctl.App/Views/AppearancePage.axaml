@@ -1,0 +1,250 @@
+<UserControl
+    x:Class="Kernctl.App.Views.AppearancePage"
+    x:DataType="pages:AppearancePageViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Kernctl.App.Controls"
+    xmlns:pages="using:Kernctl.App.ViewModels.Pages"
+    xmlns:themes="using:Kernctl.App.ViewModels.Themes">
+  <Grid>
+    <ScrollViewer>
+      <StackPanel Margin="36,24,36,36" Spacing="{DynamicResource Page.Spacing}">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="3">
+            <TextBlock Classes="display" Text="Appearance" />
+            <TextBlock Classes="body" Text="Personalize how kernctl looks and feels" />
+          </StackPanel>
+          <controls:UnsavedChangesIndicator
+              Grid.Column="1"
+              VerticalAlignment="Center"
+              IsVisible="{Binding IsDirty}" />
+        </Grid>
+
+        <WrapPanel Orientation="Horizontal">
+          <Border
+              Width="530"
+              Margin="0,0,16,16"
+              Padding="{DynamicResource Card.Padding}"
+              Background="{DynamicResource Brush.Surface.Primary}"
+              BorderBrush="{DynamicResource Brush.Border.Subtle}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource Radius.Large}">
+            <StackPanel Spacing="22">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="heading" Text="Theme controls" />
+                <TextBlock Classes="caption" Text="{Binding ActiveThemeCaption}" />
+              </StackPanel>
+
+              <StackPanel Spacing="10">
+                <TextBlock Classes="section-title" Text="Presets" />
+                <ListBox
+                    Classes="preset-list"
+                    ItemsSource="{Binding Presets}"
+                    SelectedItem="{Binding SelectedPreset, Mode=TwoWay}">
+                  <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                  </ListBox.ItemsPanel>
+                  <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="themes:ThemePresetViewModel">
+                      <controls:ThemePresetCard />
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                  <TextBox
+                      MinHeight="{DynamicResource Control.Height}"
+                      PlaceholderText="Theme name"
+                      Text="{Binding ThemeName, Mode=TwoWay}" />
+                  <Button
+                      Grid.Column="1"
+                      Classes="subtle"
+                      Command="{Binding CreateCommand}"
+                      Content="New" />
+                  <Button
+                      Grid.Column="2"
+                      Classes="subtle"
+                      Command="{Binding DuplicateCommand}"
+                      Content="Duplicate" />
+                </Grid>
+                <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8">
+                  <Button Classes="subtle" Command="{Binding ImportCommand}" Content="Import" />
+                  <Button Grid.Column="1" Classes="subtle" Command="{Binding ExportCommand}" Content="Export" />
+                  <Button
+                      Grid.Column="3"
+                      Classes="danger-outline"
+                      Command="{Binding RequestDeleteCommand}"
+                      Content="Delete"
+                      IsVisible="{Binding CanDelete}" />
+                </Grid>
+              </StackPanel>
+
+              <ItemsControl ItemsSource="{Binding ColorGroups}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="themes:ColorTokenGroupViewModel">
+                    <StackPanel Margin="0,0,0,18" Spacing="9">
+                      <TextBlock Classes="section-title" Text="{Binding Name}" />
+                      <ItemsControl ItemsSource="{Binding Tokens}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="themes:ColorTokenEditorViewModel">
+                            <controls:ColorTokenEditor />
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <StackPanel Spacing="10">
+                <TextBlock Classes="section-title" Text="Shape and density" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                  <StackPanel Spacing="5">
+                    <TextBlock Classes="caption" Text="Corner style" />
+                    <ComboBox ItemsSource="{Binding CornerStyles}" SelectedItem="{Binding CornerStyle, Mode=TwoWay}" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="1" Spacing="5">
+                    <TextBlock Classes="caption" Text="Interface density" />
+                    <ComboBox ItemsSource="{Binding Densities}" SelectedItem="{Binding Density, Mode=TwoWay}" />
+                  </StackPanel>
+                </Grid>
+              </StackPanel>
+
+              <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Classes="section-title" Text="Typography" />
+                  <TextBlock Grid.Column="1" Classes="caption" Text="{Binding FontScalePercent, StringFormat={}{0:F0}%}" />
+                </Grid>
+                <Slider
+                    Minimum="90"
+                    Maximum="120"
+                    TickFrequency="5"
+                    Value="{Binding FontScalePercent, Mode=TwoWay}" />
+                <Border
+                    Padding="14"
+                    Background="{DynamicResource Brush.Surface.Secondary}"
+                    CornerRadius="{DynamicResource Radius.Medium}">
+                  <StackPanel Spacing="5">
+                    <TextBlock Classes="heading" Text="Heading preview" />
+                    <TextBlock Classes="body" Text="Body copy remains readable and wraps naturally." />
+                    <TextBlock Classes="label" Text="Interface label" />
+                    <TextBlock Classes="caption" Text="Caption and supporting detail" />
+                  </StackPanel>
+                </Border>
+                <Button
+                    HorizontalAlignment="Left"
+                    Classes="subtle"
+                    Command="{Binding RequestResetCommand}"
+                    Content="Reset theme values" />
+              </StackPanel>
+
+              <StackPanel Spacing="10">
+                <TextBlock Classes="section-title" Text="Motion" />
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel Spacing="2">
+                    <TextBlock Classes="label" Text="Enable animations" />
+                    <TextBlock Classes="caption" Text="Keep short transitions and responsive state feedback." />
+                  </StackPanel>
+                  <ToggleSwitch
+                      Grid.Column="1"
+                      Classes="kernctl"
+                      IsChecked="{Binding EnableAnimations, Mode=TwoWay}" />
+                </Grid>
+                <ComboBox
+                    ItemsSource="{Binding MotionIntensities}"
+                    SelectedItem="{Binding MotionIntensity, Mode=TwoWay}"
+                    IsEnabled="{Binding EnableAnimations}" />
+              </StackPanel>
+
+              <StackPanel Spacing="8" IsVisible="{Binding HasContrastWarnings}">
+                <TextBlock Classes="section-title" Text="Accessibility review" />
+                <ItemsControl ItemsSource="{Binding ContrastWarnings}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="themes:ContrastWarningViewModel">
+                      <controls:ContrastWarning Margin="0,0,0,6" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <CheckBox
+                    Content="I reviewed these readability warnings"
+                    IsChecked="{Binding HasAcknowledgedContrastWarning, Mode=TwoWay}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <controls:ThemePreview Width="340" Margin="0,0,0,16" VerticalAlignment="Top" />
+        </WrapPanel>
+
+        <Border
+            Padding="14,12"
+            Background="{DynamicResource Brush.Danger.Subtle}"
+            BorderBrush="{DynamicResource Brush.Danger}"
+            BorderThickness="1"
+            CornerRadius="{DynamicResource Radius.Small}"
+            IsVisible="{Binding HasErrorMessage}">
+          <TextBlock Classes="body" Text="{Binding ErrorMessage}" />
+        </Border>
+        <TextBlock Classes="caption" Text="{Binding StatusMessage}" IsVisible="{Binding HasStatusMessage}" />
+
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="10">
+          <TextBlock
+              VerticalAlignment="Center"
+              Classes="caption"
+              Text="Ctrl+S saves · Escape cancels a preview" />
+          <Button
+              Grid.Column="1"
+              Classes="subtle"
+              Command="{Binding RequestResetCommand}"
+              Content="Reset" />
+          <Button
+              Grid.Column="2"
+              Classes="outline"
+              Command="{Binding CancelCommand}"
+              Content="Cancel" />
+          <Button
+              Grid.Column="3"
+              Command="{Binding SaveCommand}"
+              Content="Save changes"
+              IsEnabled="{Binding CanSave}" />
+        </Grid>
+      </StackPanel>
+    </ScrollViewer>
+
+    <Border
+        Background="{DynamicResource Brush.Overlay}"
+        IsVisible="{Binding IsResetConfirmationOpen}"
+        ZIndex="20">
+      <Border Classes="dialog" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Spacing="18">
+          <StackPanel Spacing="5">
+            <TextBlock Classes="heading" Text="Reset this theme?" />
+            <TextBlock Classes="body" Text="All current colour, density, shape, typography, and motion edits will return to their base values." />
+          </StackPanel>
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+            <Button Grid.Column="1" Classes="outline" Command="{Binding DismissResetCommand}" Content="Keep editing" />
+            <Button Grid.Column="2" Command="{Binding ConfirmResetCommand}" Content="Reset theme" />
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Border>
+
+    <Border
+        Background="{DynamicResource Brush.Overlay}"
+        IsVisible="{Binding IsDeleteConfirmationOpen}"
+        ZIndex="20">
+      <Border Classes="dialog" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Spacing="18">
+          <StackPanel Spacing="5">
+            <TextBlock Classes="heading" Text="Delete custom theme?" />
+            <TextBlock Classes="body" Text="This removes the saved custom theme from this PC. Built-in themes are never deleted." />
+          </StackPanel>
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+            <Button Grid.Column="1" Classes="outline" Command="{Binding DismissDeleteCommand}" Content="Cancel" />
+            <Button Grid.Column="2" Classes="danger" Command="{Binding ConfirmDeleteCommand}" Content="Delete" />
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Border>
+  </Grid>
+</UserControl>

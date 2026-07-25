@@ -5,12 +5,15 @@
   <Color x:Key="Color.Sidebar">#0C0F13</Color>
   <Color x:Key="Color.Surface.Primary">#11151A</Color>
   <Color x:Key="Color.Surface.Secondary">#151A20</Color>
+  <Color x:Key="Color.Surface.Elevated">#181E25</Color>
   <Color x:Key="Color.Border.Subtle">#202630</Color>
+  <Color x:Key="Color.Border.Strong">#343C48</Color>
   <Color x:Key="Color.Text.Primary">#F3F4F6</Color>
   <Color x:Key="Color.Text.Secondary">#A0A7B2</Color>
   <Color x:Key="Color.Text.Muted">#727B88</Color>
   <Color x:Key="Color.Accent">#8B7CFF</Color>
   <Color x:Key="Color.Accent.Hover">#9B8FFF</Color>
+  <Color x:Key="Color.Accent.Pressed">#6F60E8</Color>
   <Color x:Key="Color.Danger">#F06464</Color>
   <Color x:Key="Color.Success">#68C78A</Color>
   <Color x:Key="Color.Warning">#E5B567</Color>
@@ -19,21 +22,28 @@
   <SolidColorBrush x:Key="Brush.Sidebar" Color="{DynamicResource Color.Sidebar}" />
   <SolidColorBrush x:Key="Brush.Surface.Primary" Color="{DynamicResource Color.Surface.Primary}" />
   <SolidColorBrush x:Key="Brush.Surface.Secondary" Color="{DynamicResource Color.Surface.Secondary}" />
+  <SolidColorBrush x:Key="Brush.Surface.Elevated" Color="{DynamicResource Color.Surface.Elevated}" />
   <SolidColorBrush x:Key="Brush.Border.Subtle" Color="{DynamicResource Color.Border.Subtle}" />
+  <SolidColorBrush x:Key="Brush.Border.Strong" Color="{DynamicResource Color.Border.Strong}" />
   <SolidColorBrush x:Key="Brush.Text.Primary" Color="{DynamicResource Color.Text.Primary}" />
   <SolidColorBrush x:Key="Brush.Text.Secondary" Color="{DynamicResource Color.Text.Secondary}" />
   <SolidColorBrush x:Key="Brush.Text.Muted" Color="{DynamicResource Color.Text.Muted}" />
   <SolidColorBrush x:Key="Brush.Accent" Color="{DynamicResource Color.Accent}" />
   <SolidColorBrush x:Key="Brush.Accent.Hover" Color="{DynamicResource Color.Accent.Hover}" />
+  <SolidColorBrush x:Key="Brush.Accent.Pressed" Color="{DynamicResource Color.Accent.Pressed}" />
   <SolidColorBrush x:Key="Brush.Danger" Color="{DynamicResource Color.Danger}" />
   <SolidColorBrush x:Key="Brush.Success" Color="{DynamicResource Color.Success}" />
   <SolidColorBrush x:Key="Brush.Warning" Color="{DynamicResource Color.Warning}" />
   <SolidColorBrush x:Key="Brush.Transparent" Color="Transparent" />
   <SolidColorBrush x:Key="Brush.Focus" Color="#CC8B7CFF" />
   <SolidColorBrush x:Key="Brush.Accent.Subtle" Color="#1F8B7CFF" />
+  <SolidColorBrush x:Key="Brush.Selection" Color="#2D294F" />
   <SolidColorBrush x:Key="Brush.Surface.Hover" Color="#1B2027" />
   <SolidColorBrush x:Key="Brush.Surface.Pressed" Color="#202630" />
   <SolidColorBrush x:Key="Brush.Overlay" Color="#B8090B0E" />
+  <SolidColorBrush x:Key="Brush.Success.Subtle" Color="#2268C78A" />
+  <SolidColorBrush x:Key="Brush.Warning.Subtle" Color="#22E5B567" />
+  <SolidColorBrush x:Key="Brush.Danger.Subtle" Color="#22F06464" />
 
   <!-- Override the SimpleTheme primitives used inside built-in control templates. -->
   <SolidColorBrush x:Key="ThemeAccentBrush" Color="#8B7CFF" />
@@ -45,6 +55,21 @@
   <SolidColorBrush x:Key="HighlightForegroundBrush" Color="#F3F4F6" />
 
   <FontFamily x:Key="Font.Family">Segoe UI Variable, Segoe UI</FontFamily>
+  <x:Double x:Key="Font.Scale">1</x:Double>
+  <x:Double x:Key="Font.Size.Window">15</x:Double>
+  <x:Double x:Key="Font.Size.Display">32</x:Double>
+  <x:Double x:Key="Font.Size.Heading">18</x:Double>
+  <x:Double x:Key="Font.Size.Body">14</x:Double>
+  <x:Double x:Key="Font.Size.Label">14</x:Double>
+  <x:Double x:Key="Font.Size.Caption">12</x:Double>
+  <x:Double x:Key="Font.Size.Brand">17</x:Double>
+  <x:Double x:Key="Font.Size.Navigation">14</x:Double>
+  <x:Double x:Key="Font.Size.ToolHeading">15</x:Double>
+  <x:Double x:Key="Font.Size.ToolBody">12.5</x:Double>
+  <x:Double x:Key="Font.Size.Profile">17</x:Double>
+  <x:Double x:Key="Font.Size.DialogHeading">22</x:Double>
+  <x:Double x:Key="Line.Height.Display">38</x:Double>
+  <x:Double x:Key="Line.Height.Body">20</x:Double>
 
   <x:Double x:Key="Space.1">4</x:Double>
   <x:Double x:Key="Space.2">8</x:Double>
@@ -60,11 +85,18 @@
   <CornerRadius x:Key="Radius.Medium">10</CornerRadius>
   <CornerRadius x:Key="Radius.Large">14</CornerRadius>
   <CornerRadius x:Key="Radius.Window">12</CornerRadius>
+  <CornerRadius x:Key="Radius.Pill">999</CornerRadius>
 
   <x:Double x:Key="Icon.Small">16</x:Double>
   <x:Double x:Key="Icon.Medium">22</x:Double>
   <x:Double x:Key="Icon.Large">32</x:Double>
-  <x:Double x:Key="Control.Height">44</x:Double>
+  <x:Double x:Key="Control.Height">38</x:Double>
+  <Thickness x:Key="Card.Padding">17</Thickness>
+  <Thickness x:Key="Dialog.Padding">28</Thickness>
+  <x:Double x:Key="NavigationItem.Height">52</x:Double>
+  <x:Double x:Key="Page.Spacing">22</x:Double>
+  <x:Double x:Key="Grid.Gap">14</x:Double>
+  <x:TimeSpan x:Key="Animation.Duration">0:0:0.14</x:TimeSpan>
   <x:Double x:Key="CommandBar.Height">60</x:Double>
   <x:Double x:Key="Sidebar.Width">226</x:Double>
   <x:Double x:Key="Window.Width">1220</x:Double>

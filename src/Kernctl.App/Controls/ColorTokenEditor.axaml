@@ -1,0 +1,40 @@
+<UserControl
+    x:Class="Kernctl.App.Controls.ColorTokenEditor"
+    x:DataType="themes:ColorTokenEditorViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:themes="using:Kernctl.App.ViewModels.Themes">
+  <StackPanel Spacing="5">
+    <Grid ColumnDefinitions="*,Auto,124,Auto" ColumnSpacing="8">
+      <TextBlock
+          VerticalAlignment="Center"
+          Classes="body"
+          Text="{Binding Label}" />
+      <ColorPicker
+          Grid.Column="1"
+          Width="38"
+          Height="32"
+          Color="{Binding PickerColor, Mode=TwoWay}"
+          IsAlphaEnabled="True"
+          IsAlphaVisible="True"
+          IsColorPaletteVisible="False"
+          IsColorPreviewVisible="True" />
+      <TextBox
+          Grid.Column="2"
+          MinHeight="{DynamicResource Control.Height}"
+          VerticalContentAlignment="Center"
+          Text="{Binding Value, Mode=TwoWay}" />
+      <Button
+          Grid.Column="3"
+          MinWidth="58"
+          Classes="subtle"
+          Command="{Binding ResetCommand}"
+          Content="Reset" />
+    </Grid>
+    <TextBlock
+        Margin="0,0,0,3"
+        Classes="validation"
+        Text="{Binding ValidationMessage}"
+        IsVisible="{Binding !IsValid}" />
+  </StackPanel>
+</UserControl>

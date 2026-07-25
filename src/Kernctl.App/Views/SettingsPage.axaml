@@ -1,0 +1,61 @@
+<UserControl
+    x:Class="Kernctl.App.Views.SettingsPage"
+    x:DataType="pages:SettingsPageViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pages="using:Kernctl.App.ViewModels.Pages"
+    xmlns:views="using:Kernctl.App.Views">
+  <Grid RowDefinitions="Auto,*">
+    <Border
+        Padding="36,18,36,0"
+        Background="{DynamicResource Brush.Window}">
+      <ListBox
+          Classes="secondary-navigation"
+          ItemsSource="{Binding Sections}"
+          SelectedItem="{Binding SelectedSection, Mode=TwoWay}">
+        <ListBox.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Horizontal" Spacing="4" />
+          </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+      </ListBox>
+    </Border>
+
+    <ContentControl Grid.Row="1" IsVisible="{Binding IsAppearanceSelected}">
+      <views:AppearancePage DataContext="{Binding Appearance}" />
+    </ContentControl>
+
+    <Border
+        Grid.Row="1"
+        Margin="36,28"
+        Padding="28"
+        VerticalAlignment="Top"
+        Background="{DynamicResource Brush.Surface.Primary}"
+        BorderBrush="{DynamicResource Brush.Border.Subtle}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource Radius.Large}"
+        IsVisible="{Binding IsBehaviourSelected}">
+      <StackPanel Spacing="7">
+        <TextBlock Classes="heading" Text="Behaviour" />
+        <TextBlock Classes="body" Text="Application behaviour controls will be added in a future milestone." />
+      </StackPanel>
+    </Border>
+
+    <Border
+        Grid.Row="1"
+        Margin="36,28"
+        Padding="28"
+        VerticalAlignment="Top"
+        Background="{DynamicResource Brush.Surface.Primary}"
+        BorderBrush="{DynamicResource Brush.Border.Subtle}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource Radius.Large}"
+        IsVisible="{Binding IsAboutSelected}">
+      <StackPanel Spacing="7">
+        <TextBlock Classes="heading" Text="About kernctl" />
+        <TextBlock Classes="body" Text="kernctl is an early-stage, non-destructive Windows control centre." />
+        <TextBlock Classes="caption" Text=".NET 10 · Avalonia 12.1" />
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>

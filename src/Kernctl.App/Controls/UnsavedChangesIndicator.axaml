@@ -1,0 +1,18 @@
+<UserControl
+    x:Class="Kernctl.App.Controls.UnsavedChangesIndicator"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Border
+      Padding="9,5"
+      Background="{DynamicResource Brush.Accent.Subtle}"
+      CornerRadius="{DynamicResource Radius.Pill}">
+    <StackPanel Orientation="Horizontal" Spacing="7">
+      <Ellipse
+          Width="6"
+          Height="6"
+          VerticalAlignment="Center"
+          Fill="{DynamicResource Brush.Accent}" />
+      <TextBlock Classes="caption" Foreground="{DynamicResource Brush.Text.Secondary}" Text="Unsaved changes" />
+    </StackPanel>
+  </Border>
+</UserControl>

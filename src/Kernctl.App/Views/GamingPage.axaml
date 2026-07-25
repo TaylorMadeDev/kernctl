@@ -8,7 +8,7 @@
     xmlns:services="using:Kernctl.App.Services"
     xmlns:viewModels="using:Kernctl.App.ViewModels">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Margin="36,28,36,36" Spacing="22">
+    <StackPanel Margin="36,28,36,36" Spacing="{DynamicResource Page.Spacing}">
       <StackPanel Spacing="3">
         <TextBlock Classes="display" Text="Gaming" />
         <TextBlock Classes="body" Text="Configure your system for gaming" />
@@ -18,10 +18,10 @@
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
             <controls:AdaptiveCardPanel
-                HorizontalSpacing="14"
+                HorizontalSpacing="{DynamicResource Grid.Gap}"
                 MaximumColumns="3"
                 MinimumItemWidth="286"
-                VerticalSpacing="14" />
+                VerticalSpacing="{DynamicResource Grid.Gap}" />
           </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
         <ItemsControl.ItemTemplate>
@@ -36,13 +36,13 @@
           <TextBlock
               VerticalAlignment="Center"
               Classes="caption"
-              FontSize="13"
+              FontSize="{DynamicResource Font.Size.Caption}"
               Text="ACTIVE PROFILE" />
           <Border
               Grid.Column="1"
               Padding="9,5"
               Background="{DynamicResource Brush.Accent.Subtle}"
-              CornerRadius="10">
+              CornerRadius="{DynamicResource Radius.Pill}">
             <TextBlock
                 Classes="caption"
                 Foreground="{DynamicResource Brush.Accent}"
@@ -51,7 +51,7 @@
         </Grid>
 
         <Border
-            Padding="20,15"
+            Padding="{DynamicResource Card.Padding}"
             Background="{DynamicResource Brush.Surface.Primary}"
             BorderBrush="{DynamicResource Brush.Border.Subtle}"
             BorderThickness="1"
@@ -64,8 +64,8 @@
                 VerticalAlignment="Center">
               <Ellipse Width="22" Height="22" Fill="{DynamicResource Brush.Accent}" />
               <StackPanel Grid.Column="1" Spacing="2">
-                <TextBlock FontSize="17" FontWeight="SemiBold" Text="{Binding ActiveProfileName}" />
-                <TextBlock Classes="body" FontSize="12.5" Text="{Binding ActiveProfileDescription}" />
+                <TextBlock FontSize="{DynamicResource Font.Size.Profile}" FontWeight="SemiBold" Text="{Binding ActiveProfileName}" />
+                <TextBlock Classes="body" FontSize="{DynamicResource Font.Size.ToolBody}" Text="{Binding ActiveProfileDescription}" />
               </StackPanel>
             </Grid>
 
