@@ -8,8 +8,8 @@
     xmlns:services="using:Kernctl.App.Services"
     xmlns:viewModels="using:Kernctl.App.ViewModels">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Margin="54,44,54,48" Spacing="28">
-      <StackPanel Spacing="5">
+    <StackPanel Margin="36,28,36,36" Spacing="22">
+      <StackPanel Spacing="3">
         <TextBlock Classes="display" Text="Gaming" />
         <TextBlock Classes="body" Text="Configure your system for gaming" />
       </StackPanel>
@@ -17,14 +17,13 @@
       <ItemsControl ItemsSource="{Binding Tools}">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
-            <UniformGrid Columns="2" />
+            <controls:AdaptiveCardPanel
+                HorizontalSpacing="14"
+                MaximumColumns="3"
+                MinimumItemWidth="286"
+                VerticalSpacing="14" />
           </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
-        <ItemsControl.Styles>
-          <Style Selector="ContentPresenter">
-            <Setter Property="Margin" Value="7" />
-          </Style>
-        </ItemsControl.Styles>
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="viewModels:ToolCardViewModel">
             <controls:ToolCard />
@@ -52,48 +51,64 @@
         </Grid>
 
         <Border
-            Padding="28"
+            Padding="20,15"
             Background="{DynamicResource Brush.Surface.Primary}"
             BorderBrush="{DynamicResource Brush.Border.Subtle}"
             BorderThickness="1"
             CornerRadius="{DynamicResource Radius.Medium}">
-          <Grid ColumnDefinitions="2.2*,1.1*,1.1*,1.25*,Auto">
-            <Grid ColumnDefinitions="42,*" VerticalAlignment="Center">
-              <Ellipse Width="26" Height="26" Fill="{DynamicResource Brush.Accent}" />
-              <StackPanel Grid.Column="1" Spacing="4">
-                <TextBlock FontSize="20" FontWeight="SemiBold" Text="{Binding ActiveProfileName}" />
-                <TextBlock Classes="body" FontSize="14" Text="{Binding ActiveProfileDescription}" />
+          <WrapPanel>
+            <Grid
+                Width="224"
+                Margin="0,5,16,5"
+                ColumnDefinitions="36,*"
+                VerticalAlignment="Center">
+              <Ellipse Width="22" Height="22" Fill="{DynamicResource Brush.Accent}" />
+              <StackPanel Grid.Column="1" Spacing="2">
+                <TextBlock FontSize="17" FontWeight="SemiBold" Text="{Binding ActiveProfileName}" />
+                <TextBlock Classes="body" FontSize="12.5" Text="{Binding ActiveProfileDescription}" />
               </StackPanel>
             </Grid>
 
-            <Border Grid.Column="1" BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="1,0,0,0">
+            <Border
+                Width="118"
+                Margin="0,5,12,5"
+                BorderBrush="{DynamicResource Brush.Border.Subtle}"
+                BorderThickness="1,0,0,0">
               <controls:MetricDisplay
-                  Margin="22,0"
+                  Margin="16,0,0,0"
                   Icon="{x:Static services:IconCatalog.Processor}"
                   Label="CPU"
                   Value="{Binding CpuValue}" />
             </Border>
-            <Border Grid.Column="2" BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="1,0,0,0">
+            <Border
+                Width="118"
+                Margin="0,5,12,5"
+                BorderBrush="{DynamicResource Brush.Border.Subtle}"
+                BorderThickness="1,0,0,0">
               <controls:MetricDisplay
-                  Margin="22,0"
+                  Margin="16,0,0,0"
                   Icon="{x:Static services:IconCatalog.Memory}"
                   Label="RAM"
                   Value="{Binding MemoryValue}" />
             </Border>
-            <Border Grid.Column="3" BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="1,0,0,0">
+            <Border
+                Width="138"
+                Margin="0,5,12,5"
+                BorderBrush="{DynamicResource Brush.Border.Subtle}"
+                BorderThickness="1,0,0,0">
               <controls:MetricDisplay
-                  Margin="22,0"
+                  Margin="16,0,0,0"
                   Icon="{x:Static services:IconCatalog.Power}"
                   Label="Power"
                   Value="{Binding PowerValue}" />
             </Border>
             <Button
-                Grid.Column="4"
-                Margin="24,0,0,0"
+                Margin="0,5"
+                VerticalAlignment="Center"
                 Classes="outline"
                 Command="{Binding OpenProfileDialogCommand}"
                 Content="Change Profile" />
-          </Grid>
+          </WrapPanel>
         </Border>
       </StackPanel>
     </StackPanel>

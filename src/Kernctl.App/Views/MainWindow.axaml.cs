@@ -52,20 +52,6 @@ public sealed partial class MainWindow : Window, IDisposable
         disposed = true;
     }
 
-    private void MinimizeButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs eventArgs) =>
-        WindowState = WindowState.Minimized;
-
-    private void MaximizeButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs eventArgs) =>
-        ToggleMaximized();
-
-    private void CloseButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs eventArgs) =>
-        Close();
-
-    private void ToggleMaximized() =>
-        WindowState = WindowState == WindowState.Maximized
-            ? WindowState.Normal
-            : WindowState.Maximized;
-
     private void SearchBox_GotFocus(object? sender, Avalonia.Interactivity.RoutedEventArgs eventArgs) =>
         ViewModel?.BeginSearch();
 

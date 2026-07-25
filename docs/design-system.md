@@ -37,9 +37,14 @@ height. Text containers avoid fixed heights to preserve layout at higher scaling
 
 Buttons, navigation items, cards, toggles, search, metric displays, dialogs, toast
 foundations, loading states, and empty states share normal, pointer-over, pressed,
-focused, selected, and disabled treatments as relevant. Focus uses a visible violet
-outline. State is always reinforced by text, shape, or position rather than colour
-alone.
+focused, selected, and disabled treatments as relevant. The kernctl toggle uses its
+own track and thumb template instead of inheriting the operating-system accent.
+Focus uses a visible violet outline. State is always reinforced by text, shape, or
+position rather than colour alone.
+
+The desktop window uses native operating-system decorations. The content shell starts
+at a compact 1220×760 and supports a 900×600 minimum. Tool cards use an adaptive panel:
+three columns when space permits, two at medium widths, and one on narrow layouts.
 
 Animations are limited to short transitions. The duration token is isolated so a
 future reduced-motion preference can set it to zero.

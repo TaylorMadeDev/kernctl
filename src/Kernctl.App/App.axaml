@@ -3,7 +3,8 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:pages="using:Kernctl.App.ViewModels.Pages"
-    xmlns:views="using:Kernctl.App.Views">
+    xmlns:views="using:Kernctl.App.Views"
+    RequestedThemeVariant="Dark">
   <Application.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>

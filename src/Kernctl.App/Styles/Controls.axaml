@@ -12,20 +12,20 @@
     <Setter Property="TextWrapping" Value="Wrap" />
   </Style>
   <Style Selector="TextBlock.display">
-    <Setter Property="FontSize" Value="38" />
+    <Setter Property="FontSize" Value="32" />
     <Setter Property="FontWeight" Value="SemiBold" />
     <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
-    <Setter Property="LineHeight" Value="46" />
+    <Setter Property="LineHeight" Value="38" />
   </Style>
   <Style Selector="TextBlock.heading">
-    <Setter Property="FontSize" Value="20" />
+    <Setter Property="FontSize" Value="18" />
     <Setter Property="FontWeight" Value="SemiBold" />
     <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
   </Style>
   <Style Selector="TextBlock.body">
-    <Setter Property="FontSize" Value="16" />
+    <Setter Property="FontSize" Value="14" />
     <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
-    <Setter Property="LineHeight" Value="24" />
+    <Setter Property="LineHeight" Value="20" />
   </Style>
   <Style Selector="TextBlock.label">
     <Setter Property="FontSize" Value="14" />
@@ -39,8 +39,8 @@
   </Style>
 
   <Style Selector="Button">
-    <Setter Property="MinHeight" Value="{DynamicResource Control.Height}" />
-    <Setter Property="Padding" Value="18,9" />
+    <Setter Property="MinHeight" Value="38" />
+    <Setter Property="Padding" Value="15,7" />
     <Setter Property="CornerRadius" Value="{DynamicResource Radius.Small}" />
     <Setter Property="Background" Value="{DynamicResource Brush.Accent}" />
     <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
@@ -69,24 +69,9 @@
   <Style Selector="Button.outline:pointerover">
     <Setter Property="Background" Value="{DynamicResource Brush.Accent.Subtle}" />
   </Style>
-  <Style Selector="Button.chrome">
-    <Setter Property="MinWidth" Value="48" />
-    <Setter Property="MinHeight" Value="42" />
-    <Setter Property="Padding" Value="12" />
-    <Setter Property="Background" Value="{DynamicResource Brush.Transparent}" />
-    <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="CornerRadius" Value="0" />
-  </Style>
-  <Style Selector="Button.chrome:pointerover">
-    <Setter Property="Background" Value="{DynamicResource Brush.Surface.Hover}" />
-  </Style>
-  <Style Selector="Button.chrome.close:pointerover">
-    <Setter Property="Background" Value="{DynamicResource Brush.Danger}" />
-  </Style>
-
   <Style Selector="TextBox.search">
-    <Setter Property="Height" Value="{DynamicResource Control.Height}" />
-    <Setter Property="Padding" Value="42,10,14,10" />
+    <Setter Property="Height" Value="38" />
+    <Setter Property="Padding" Value="38,8,12,8" />
     <Setter Property="Background" Value="{DynamicResource Brush.Window}" />
     <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
     <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border.Subtle}" />
@@ -107,8 +92,8 @@
     <Setter Property="BorderThickness" Value="0" />
   </Style>
   <Style Selector="ListBox.navigation > ListBoxItem">
-    <Setter Property="Height" Value="62" />
-    <Setter Property="Margin" Value="8,3" />
+    <Setter Property="Height" Value="52" />
+    <Setter Property="Margin" Value="8,2" />
     <Setter Property="Padding" Value="0" />
     <Setter Property="Background" Value="{DynamicResource Brush.Transparent}" />
     <Setter Property="CornerRadius" Value="{DynamicResource Radius.Small}" />
@@ -130,8 +115,8 @@
   </Style>
 
   <Style Selector="Border.tool-card">
-    <Setter Property="MinHeight" Value="124" />
-    <Setter Property="Padding" Value="26,22" />
+    <Setter Property="MinHeight" Value="106" />
+    <Setter Property="Padding" Value="20,17" />
     <Setter Property="Background" Value="{DynamicResource Brush.Surface.Primary}" />
     <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border.Subtle}" />
     <Setter Property="BorderThickness" Value="1" />
@@ -145,11 +130,62 @@
   <Style Selector="ToggleSwitch.kernctl">
     <Setter Property="OnContent" Value="" />
     <Setter Property="OffContent" Value="" />
-    <Setter Property="MinWidth" Value="58" />
+    <Setter Property="Width" Value="44" />
+    <Setter Property="Height" Value="24" />
+    <Setter Property="MinWidth" Value="44" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
     <Setter Property="HorizontalAlignment" Value="Right" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border
+            Name="PART_Track"
+            Width="44"
+            Height="24"
+            Padding="3"
+            Background="{DynamicResource Brush.Surface.Pressed}"
+            BorderBrush="{DynamicResource Brush.Text.Muted}"
+            BorderThickness="1"
+            CornerRadius="12">
+          <Canvas Width="38" Height="18">
+            <Grid
+                Name="PART_MovingKnobs"
+                Width="16"
+                Height="16"
+                Canvas.Left="0"
+                Canvas.Top="1">
+              <Ellipse
+                  Name="PART_Thumb"
+                  Width="16"
+                  Height="16"
+                  Fill="{DynamicResource Brush.Text.Secondary}" />
+            </Grid>
+          </Canvas>
+        </Border>
+      </ControlTemplate>
+    </Setter>
   </Style>
-  <Style Selector="ToggleSwitch.kernctl:focus-visible">
+  <Style Selector="ToggleSwitch.kernctl:pointerover /template/ Border#PART_Track">
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Text.Secondary}" />
+  </Style>
+  <Style Selector="ToggleSwitch.kernctl:checked /template/ Border#PART_Track">
+    <Setter Property="Background" Value="{DynamicResource Brush.Accent}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+  </Style>
+  <Style Selector="ToggleSwitch.kernctl:checked:pointerover /template/ Border#PART_Track">
+    <Setter Property="Background" Value="{DynamicResource Brush.Accent.Hover}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Accent.Hover}" />
+  </Style>
+  <Style Selector="ToggleSwitch.kernctl:checked /template/ Ellipse#PART_Thumb">
+    <Setter Property="Fill" Value="{DynamicResource Brush.Text.Primary}" />
+  </Style>
+  <Style Selector="ToggleSwitch.kernctl:focus-visible /template/ Border#PART_Track">
     <Setter Property="BorderBrush" Value="{DynamicResource Brush.Focus}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+  <Style Selector="ToggleSwitch.kernctl:disabled">
+    <Setter Property="Opacity" Value="0.42" />
   </Style>
 
   <Style Selector="ToolTip">

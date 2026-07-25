@@ -6,7 +6,7 @@
     xmlns:controls="using:Kernctl.App.Controls"
     xmlns:pages="using:Kernctl.App.ViewModels.Pages">
   <ScrollViewer>
-    <StackPanel Margin="54,46" Spacing="28">
+    <StackPanel Margin="36,30" Spacing="22">
       <StackPanel Spacing="6">
         <TextBlock Classes="display" Text="{Binding Title}" />
         <TextBlock Classes="body" Text="Your PC, under control." />

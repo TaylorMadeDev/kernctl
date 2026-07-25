@@ -3,7 +3,6 @@
     x:DataType="viewModels:MainWindowViewModel"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:chrome="using:Avalonia.Controls.Chrome"
     xmlns:controls="using:Kernctl.App.Controls"
     xmlns:services="using:Kernctl.App.Services"
     xmlns:viewModels="using:Kernctl.App.ViewModels"
@@ -13,39 +12,83 @@
     MinHeight="{DynamicResource Window.MinHeight}"
     Title="kernctl"
     CanResize="True"
-    ExtendClientAreaTitleBarHeightHint="68"
-    ExtendClientAreaToDecorationsHint="True"
     KeyDown="Window_KeyDown"
-    WindowDecorations="None"
+    ShowInTaskbar="True"
+    WindowDecorations="Full"
     WindowStartupLocation="CenterScreen">
-  <Border
+  <Grid
       Background="{DynamicResource Brush.Window}"
-      BorderBrush="{DynamicResource Brush.Border.Subtle}"
-      BorderThickness="1"
-      CornerRadius="{DynamicResource Radius.Window}">
-    <Grid RowDefinitions="68,*">
+      ColumnDefinitions="226,*">
+    <Border
+        Grid.Column="0"
+        Background="{DynamicResource Brush.Sidebar}"
+        BorderBrush="{DynamicResource Brush.Border.Subtle}"
+        BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="60,*">
+        <StackPanel
+            Grid.Row="0"
+            Margin="18,0,0,0"
+            VerticalAlignment="Center"
+            Orientation="Horizontal"
+            Spacing="11">
+          <controls:LogoMark Width="28" Height="28" />
+          <TextBlock
+              VerticalAlignment="Center"
+              FontSize="17"
+              FontWeight="Bold"
+              Text="kernctl" />
+        </StackPanel>
+
+        <ListBox
+            Grid.Row="1"
+            Classes="navigation"
+            ItemsSource="{Binding NavigationItems}"
+            SelectedItem="{Binding SelectedNavigation, Mode=TwoWay}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="viewModels:NavigationItemViewModel">
+              <Grid ColumnDefinitions="4,46,*">
+                <Border
+                    Classes="selection-indicator"
+                    Width="3"
+                    Height="32"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource Brush.Accent}"
+                    CornerRadius="0,2,2,0"
+                    Opacity="0" />
+                <controls:SvgIcon
+                    Grid.Column="1"
+                    Width="20"
+                    Height="20"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IconBrush="{DynamicResource Brush.Text.Primary}"
+                    Source="{Binding Icon}" />
+                <TextBlock
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    FontWeight="Medium"
+                    Text="{Binding Title}" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Column="1" RowDefinitions="60,*">
       <Border
           Grid.Row="0"
           Background="{DynamicResource Brush.Window}"
           BorderBrush="{DynamicResource Brush.Border.Subtle}"
-          BorderThickness="0,0,0,1"
-          chrome:WindowDecorationProperties.ElementRole="TitleBar">
-        <Grid ColumnDefinitions="278,*,360,160">
-          <StackPanel
-              Grid.Column="0"
-              Margin="20,0,0,0"
+          BorderThickness="0,0,0,1">
+        <Grid Margin="24,0" ColumnDefinitions="*,300">
+          <TextBlock
               VerticalAlignment="Center"
-              Orientation="Horizontal"
-              Spacing="14">
-            <controls:LogoMark />
-            <TextBlock
-                VerticalAlignment="Center"
-                FontSize="19"
-                FontWeight="Bold"
-                Text="kernctl" />
-          </StackPanel>
-
-          <Grid Grid.Column="2" Margin="0,0,18,0" VerticalAlignment="Center">
+              Classes="caption"
+              Text="YOUR PC, UNDER CONTROL." />
+          <Grid Grid.Column="1" VerticalAlignment="Center">
             <TextBox
                 x:Name="SearchBox"
                 Classes="search"
@@ -53,208 +96,127 @@
                 KeyDown="SearchBox_KeyDown"
                 Text="{Binding SearchQuery, Mode=TwoWay}" />
             <controls:SvgIcon
-                Width="18"
-                Height="18"
-                Margin="14,0,0,0"
+                Width="16"
+                Height="16"
+                Margin="13,0,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 IsHitTestVisible="False"
                 IconBrush="{DynamicResource Brush.Text.Secondary}"
                 Source="{x:Static services:IconCatalog.Search}" />
           </Grid>
-
-          <Grid Grid.Column="3" ColumnDefinitions="*,*,*">
-            <Button
-                Grid.Column="0"
-                Classes="chrome"
-                Click="MinimizeButton_Click"
-                ToolTip.Tip="Minimize">
-              <controls:SvgIcon
-                  Width="14"
-                  Height="14"
-                  IconBrush="{DynamicResource Brush.Text.Primary}"
-                  Source="{x:Static services:IconCatalog.Minimize}" />
-            </Button>
-            <Button
-                Grid.Column="1"
-                Classes="chrome"
-                Click="MaximizeButton_Click"
-                ToolTip.Tip="Maximize or restore">
-              <controls:SvgIcon
-                  Width="13"
-                  Height="13"
-                  IconBrush="{DynamicResource Brush.Text.Primary}"
-                  Source="{x:Static services:IconCatalog.Maximize}" />
-            </Button>
-            <Button
-                Grid.Column="2"
-                Classes="chrome close"
-                Click="CloseButton_Click"
-                ToolTip.Tip="Close">
-              <controls:SvgIcon
-                  Width="15"
-                  Height="15"
-                  IconBrush="{DynamicResource Brush.Text.Primary}"
-                  Source="{x:Static services:IconCatalog.Close}" />
-            </Button>
-          </Grid>
         </Grid>
       </Border>
 
-      <Grid Grid.Row="1" ColumnDefinitions="278,*">
-        <Border
-            Grid.Column="0"
-            Background="{DynamicResource Brush.Sidebar}"
-            BorderBrush="{DynamicResource Brush.Border.Subtle}"
-            BorderThickness="0,0,1,0">
+      <ContentControl Grid.Row="1" Content="{Binding CurrentPage}" />
+    </Grid>
+
+    <Border
+        Grid.Column="1"
+        Width="300"
+        MaxHeight="380"
+        Margin="0,52,24,0"
+        Padding="6"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Top"
+        Background="{DynamicResource Brush.Surface.Primary}"
+        BorderBrush="{DynamicResource Brush.Border.Subtle}"
+        BorderThickness="1"
+        CornerRadius="{DynamicResource Radius.Medium}"
+        IsVisible="{Binding IsSearchOpen}"
+        ZIndex="20">
+      <ListBox
+          Background="Transparent"
+          BorderThickness="0"
+          ItemsSource="{Binding SearchResults}"
+          SelectedItem="{Binding SelectedSearchResult, Mode=TwoWay}">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="viewModels:SearchResultViewModel">
+            <Grid Margin="9,7" ColumnDefinitions="*,Auto">
+              <StackPanel Spacing="2">
+                <TextBlock Classes="label" Text="{Binding Title}" />
+                <TextBlock Classes="caption" Text="{Binding Category}" />
+              </StackPanel>
+              <TextBlock
+                  Grid.Column="1"
+                  VerticalAlignment="Center"
+                  Classes="caption"
+                  Text="{Binding DestinationTitle}" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Border>
+
+    <Border
+        Grid.ColumnSpan="2"
+        Background="{DynamicResource Brush.Overlay}"
+        IsVisible="{Binding Gaming.IsProfileDialogOpen}"
+        ZIndex="30">
+      <Border
+          Classes="dialog"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center">
+        <StackPanel Spacing="20">
+          <StackPanel Spacing="5">
+            <TextBlock Classes="heading" FontSize="22" Text="Change profile" />
+            <TextBlock
+                Classes="body"
+                Text="Choose a session-only profile. This does not change Windows." />
+          </StackPanel>
+
           <ListBox
-              Classes="navigation"
-              ItemsSource="{Binding NavigationItems}"
-              SelectedItem="{Binding SelectedNavigation, Mode=TwoWay}">
+              Background="Transparent"
+              BorderThickness="0"
+              ItemsSource="{Binding Gaming.ProfileChoices}"
+              SelectedItem="{Binding Gaming.SelectedProfileChoice, Mode=TwoWay}">
             <ListBox.ItemTemplate>
-              <DataTemplate x:DataType="viewModels:NavigationItemViewModel">
-                <Grid ColumnDefinitions="4,54,*">
-                  <Border
-                      Classes="selection-indicator"
-                      Width="3"
-                      Height="40"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Center"
-                      Background="{DynamicResource Brush.Accent}"
-                      CornerRadius="0,2,2,0"
-                      Opacity="0" />
+              <DataTemplate x:DataType="viewModels:ProfileChoiceViewModel">
+                <Grid Margin="8" ColumnDefinitions="36,*">
                   <controls:SvgIcon
-                      Grid.Column="1"
-                      Width="23"
-                      Height="23"
-                      HorizontalAlignment="Center"
+                      Width="20"
+                      Height="20"
                       VerticalAlignment="Center"
-                      IconBrush="{DynamicResource Brush.Text.Primary}"
+                      IconBrush="{DynamicResource Brush.Accent}"
                       Source="{Binding Icon}" />
-                  <TextBlock
-                      Grid.Column="2"
-                      VerticalAlignment="Center"
-                      FontSize="16"
-                      FontWeight="Medium"
-                      Text="{Binding Title}" />
+                  <StackPanel Grid.Column="1" Spacing="2">
+                    <TextBlock Classes="label" Text="{Binding Name}" />
+                    <TextBlock Classes="caption" Text="{Binding Description}" />
+                  </StackPanel>
                 </Grid>
               </DataTemplate>
             </ListBox.ItemTemplate>
           </ListBox>
-        </Border>
 
-        <ContentControl Grid.Column="1" Content="{Binding CurrentPage}" />
-      </Grid>
-
-      <Border
-          Grid.Row="0"
-          Grid.RowSpan="2"
-          Width="342"
-          MaxHeight="420"
-          Margin="0,58,178,0"
-          Padding="6"
-          HorizontalAlignment="Right"
-          VerticalAlignment="Top"
-          Background="{DynamicResource Brush.Surface.Primary}"
-          BorderBrush="{DynamicResource Brush.Border.Subtle}"
-          BorderThickness="1"
-          CornerRadius="{DynamicResource Radius.Medium}"
-          IsVisible="{Binding IsSearchOpen}"
-          ZIndex="20">
-        <ListBox
-            Background="Transparent"
-            BorderThickness="0"
-            ItemsSource="{Binding SearchResults}"
-            SelectedItem="{Binding SelectedSearchResult, Mode=TwoWay}">
-          <ListBox.ItemTemplate>
-            <DataTemplate x:DataType="viewModels:SearchResultViewModel">
-              <Grid Margin="10,8" ColumnDefinitions="*,Auto">
-                <StackPanel Spacing="2">
-                  <TextBlock Classes="label" Text="{Binding Title}" />
-                  <TextBlock Classes="caption" Text="{Binding Category}" />
-                </StackPanel>
-                <TextBlock
-                    Grid.Column="1"
-                    VerticalAlignment="Center"
-                    Classes="caption"
-                    Text="{Binding DestinationTitle}" />
-              </Grid>
-            </DataTemplate>
-          </ListBox.ItemTemplate>
-        </ListBox>
+          <Grid ColumnDefinitions="*,Auto,Auto">
+            <TextBlock
+                VerticalAlignment="Center"
+                Classes="caption"
+                Text="UI state only" />
+            <Button
+                Grid.Column="1"
+                Margin="0,0,10,0"
+                Classes="outline"
+                Command="{Binding Gaming.CloseProfileDialogCommand}"
+                Content="Cancel" />
+            <Button
+                Grid.Column="2"
+                Command="{Binding Gaming.ConfirmProfileCommand}"
+                Content="Use profile" />
+          </Grid>
+        </StackPanel>
       </Border>
+    </Border>
 
-      <Border
-          Grid.Row="0"
-          Grid.RowSpan="2"
-          Background="{DynamicResource Brush.Overlay}"
-          IsVisible="{Binding Gaming.IsProfileDialogOpen}"
-          ZIndex="30">
-        <Border
-            Classes="dialog"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center">
-          <StackPanel Spacing="22">
-            <StackPanel Spacing="5">
-              <TextBlock Classes="heading" FontSize="24" Text="Change profile" />
-              <TextBlock
-                  Classes="body"
-                  Text="Choose a session-only profile. This does not change Windows." />
-            </StackPanel>
-
-            <ListBox
-                Background="Transparent"
-                BorderThickness="0"
-                ItemsSource="{Binding Gaming.ProfileChoices}"
-                SelectedItem="{Binding Gaming.SelectedProfileChoice, Mode=TwoWay}">
-              <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:ProfileChoiceViewModel">
-                  <Grid Margin="8" ColumnDefinitions="38,*">
-                    <controls:SvgIcon
-                        Width="22"
-                        Height="22"
-                        VerticalAlignment="Center"
-                        IconBrush="{DynamicResource Brush.Accent}"
-                        Source="{Binding Icon}" />
-                    <StackPanel Grid.Column="1" Spacing="2">
-                      <TextBlock Classes="label" Text="{Binding Name}" />
-                      <TextBlock Classes="caption" Text="{Binding Description}" />
-                    </StackPanel>
-                  </Grid>
-                </DataTemplate>
-              </ListBox.ItemTemplate>
-            </ListBox>
-
-            <Grid ColumnDefinitions="*,Auto,Auto">
-              <TextBlock
-                  VerticalAlignment="Center"
-                  Classes="caption"
-                  Text="UI state only" />
-              <Button
-                  Grid.Column="1"
-                  Margin="0,0,10,0"
-                  Classes="outline"
-                  Command="{Binding Gaming.CloseProfileDialogCommand}"
-                  Content="Cancel" />
-              <Button
-                  Grid.Column="2"
-                  Command="{Binding Gaming.ConfirmProfileCommand}"
-                  Content="Use profile" />
-            </Grid>
-          </StackPanel>
-        </Border>
-      </Border>
-
-      <Border
-          Grid.Row="1"
-          Margin="0,0,24,24"
-          HorizontalAlignment="Right"
-          VerticalAlignment="Bottom"
-          Classes="toast"
-          IsVisible="False"
-          ZIndex="40">
-        <TextBlock Text="Notification foundation" />
-      </Border>
-    </Grid>
-  </Border>
+    <Border
+        Grid.Column="1"
+        Margin="0,0,20,20"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Bottom"
+        Classes="toast"
+        IsVisible="False"
+        ZIndex="40">
+      <TextBlock Text="Notification foundation" />
+    </Border>
+  </Grid>
 </Window>

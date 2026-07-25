@@ -7,17 +7,17 @@
     xmlns:services="using:Kernctl.App.Services"
     xmlns:viewModels="using:Kernctl.App.ViewModels">
   <Border Classes="tool-card">
-    <Grid ColumnDefinitions="64,*,Auto">
+    <Grid ColumnDefinitions="48,*,Auto">
       <controls:SvgIcon
-          Width="38"
-          Height="38"
+          Width="30"
+          Height="30"
           HorizontalAlignment="Left"
           VerticalAlignment="Center"
           IconBrush="{DynamicResource Brush.Accent}"
           Source="{Binding Icon}" />
-      <StackPanel Grid.Column="1" Margin="0,0,18,0" VerticalAlignment="Center" Spacing="5">
-        <TextBlock Classes="heading" FontSize="17" Text="{Binding Title}" />
-        <TextBlock Classes="body" FontSize="14" Text="{Binding Description}" />
+      <StackPanel Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center" Spacing="4">
+        <TextBlock Classes="heading" FontSize="15" Text="{Binding Title}" />
+        <TextBlock Classes="body" FontSize="12.5" Text="{Binding Description}" />
       </StackPanel>
       <ToggleSwitch
           Grid.Column="2"
