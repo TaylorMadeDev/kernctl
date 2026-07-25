@@ -43,6 +43,19 @@ public sealed class MainWindowViewModelTests
         Assert.Throws<ArgumentException>(() => viewModel.NavigateTo("Unknown"));
     }
 
+    [Fact]
+    public void EveryDeclaredNavigationDestinationCanBeOpened()
+    {
+        var viewModel = CreateViewModel();
+
+        foreach (var destination in viewModel.NavigationItems)
+        {
+            viewModel.NavigateTo(destination.Title);
+            Assert.Equal(destination, viewModel.SelectedNavigation);
+            Assert.NotNull(viewModel.CurrentPage);
+        }
+    }
+
     private static MainWindowViewModel CreateViewModel()
     {
         var profiles = new ProfileService();
