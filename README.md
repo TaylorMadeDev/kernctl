@@ -4,7 +4,8 @@
 
 kernctl is an early-stage Windows control centre for storage, gaming, performance,
 network, application, and safe system-management workflows. This milestone provides
-the repository architecture and a polished, non-destructive Avalonia UI prototype.
+the repository architecture, a polished non-destructive Avalonia UI, and a complete
+runtime theme customizer under **Settings → Appearance**.
 
 > [!IMPORTANT]
 > kernctl is not production-ready. All profile and tool interactions in this
@@ -24,6 +25,7 @@ design system.
 - CommunityToolkit.Mvvm
 - Microsoft.Extensions.DependencyInjection
 - xUnit v3
+- Avalonia ColorPicker
 
 ## Prerequisites
 
@@ -54,6 +56,28 @@ dotnet run --project src/Kernctl.App/Kernctl.App.csproj
 - Reusable controls, local vector assets, and clear keyboard focus.
 - MVVM separation with cached page state and dependency injection.
 - Honest UI: sample values and unavailable modules are identified explicitly.
+- Runtime themes update shared Avalonia resources without recreating pages or restarting.
+
+## Theme customization
+
+Appearance settings provide four immutable built-in themes—kernctl Dark, OLED,
+Graphite, and Ember—plus named custom themes. Users can edit validated colour tokens,
+density, corner style, font scale, and motion, with immediate application-wide preview.
+Changes are committed explicitly; cancelling or closing with a preview restores the
+last saved theme.
+
+Custom themes can be imported and exported as safe, versioned JSON data. Preferences
+are stored without elevation under:
+
+```text
+%LocalAppData%/kernctl/
+├── settings.json
+└── themes/
+    └── <sanitized-theme-id>.json
+```
+
+Theme files contain only appearance data—never paths, system settings, credentials,
+or personal information.
 
 ## Safety principles
 
@@ -64,7 +88,7 @@ dotnet run --project src/Kernctl.App/Kernctl.App.csproj
 
 ## Roadmap
 
-1. Validate the shell with accessibility and visual regression testing.
+1. Add automated visual regression coverage for the shell and theme editor.
 2. Add read-only Windows hardware and storage inventory.
 3. Implement a transactional action engine with explicit rollback.
 4. Design a restricted broker for narrowly approved privileged operations.

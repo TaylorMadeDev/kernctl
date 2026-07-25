@@ -3,6 +3,8 @@
 - Inspect `git status` before editing and preserve unrelated user changes.
 - Use MVVM; keep business logic out of code-behind.
 - Use design tokens instead of hardcoded UI colours and reusable dimensions.
+- New and updated controls must consume dynamic theme resources for colours, typography,
+  reusable spacing, density-sensitive sizes, corner radii, and animation durations.
 - Use supplied local fonts and SVG icons. Never substitute emoji, Unicode icon glyphs,
   downloaded icons, or rasterized SVGs.
 - Never store passwords, cookies, session tokens, or authentication tokens.
