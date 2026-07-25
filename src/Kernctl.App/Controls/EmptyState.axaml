@@ -1,0 +1,17 @@
+<UserControl
+    x:Class="Kernctl.App.Controls.EmptyState"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Border
+      Padding="28"
+      Background="{DynamicResource Brush.Surface.Primary}"
+      BorderBrush="{DynamicResource Brush.Border.Subtle}"
+      BorderThickness="1"
+      CornerRadius="{DynamicResource Radius.Medium}">
+    <StackPanel HorizontalAlignment="Center" Spacing="8">
+      <Ellipse Width="8" Height="8" Fill="{DynamicResource Brush.Text.Muted}" />
+      <TextBlock Classes="heading" HorizontalAlignment="Center" Text="Nothing to show yet" />
+      <TextBlock Classes="body" HorizontalAlignment="Center" Text="This module has no available results." />
+    </StackPanel>
+  </Border>
+</UserControl>

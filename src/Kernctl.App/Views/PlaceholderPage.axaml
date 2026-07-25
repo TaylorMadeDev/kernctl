@@ -1,0 +1,47 @@
+<UserControl
+    x:Class="Kernctl.App.Views.PlaceholderPage"
+    x:DataType="pages:PlaceholderPageViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Kernctl.App.Controls"
+    xmlns:pages="using:Kernctl.App.ViewModels.Pages">
+  <ScrollViewer>
+    <StackPanel Margin="54,46" Spacing="28">
+      <StackPanel Spacing="6">
+        <TextBlock Classes="display" Text="{Binding Title}" />
+        <TextBlock Classes="body" Text="Your PC, under control." />
+      </StackPanel>
+
+      <Border
+          MaxWidth="720"
+          Padding="34"
+          HorizontalAlignment="Left"
+          Background="{DynamicResource Brush.Surface.Primary}"
+          BorderBrush="{DynamicResource Brush.Border.Subtle}"
+          BorderThickness="1"
+          CornerRadius="{DynamicResource Radius.Large}">
+        <Grid ColumnDefinitions="70,*">
+          <Border
+              Width="52"
+              Height="52"
+              Background="{DynamicResource Brush.Accent.Subtle}"
+              CornerRadius="26">
+            <controls:SvgIcon
+                Width="24"
+                Height="24"
+                IconBrush="{DynamicResource Brush.Accent}"
+                Source="{Binding Icon}" />
+          </Border>
+          <StackPanel Grid.Column="1" Spacing="8">
+            <TextBlock Classes="heading" Text="Module not implemented" />
+            <TextBlock Classes="body" Text="{Binding Description}" />
+            <TextBlock
+                Margin="0,8,0,0"
+                Classes="caption"
+                Text="No system changes or fabricated results are shown." />
+          </StackPanel>
+        </Grid>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

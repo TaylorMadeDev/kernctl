@@ -1,0 +1,9 @@
+<UserControl
+    x:Class="Kernctl.App.Controls.LoadingState"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StackPanel HorizontalAlignment="Center" Spacing="12">
+    <ProgressBar Width="180" Height="4" IsIndeterminate="True" />
+    <TextBlock Classes="body" Text="Loading…" />
+  </StackPanel>
+</UserControl>

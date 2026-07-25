@@ -1,0 +1,19 @@
+<UserControl
+    x:Class="Kernctl.App.Controls.MetricDisplay"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Kernctl.App.Controls">
+  <Grid ColumnDefinitions="38,*">
+    <controls:SvgIcon
+        Width="24"
+        Height="24"
+        HorizontalAlignment="Left"
+        VerticalAlignment="Center"
+        IconBrush="{DynamicResource Brush.Accent}"
+        Source="{Binding Icon, RelativeSource={RelativeSource AncestorType=controls:MetricDisplay}}" />
+    <StackPanel Grid.Column="1" Spacing="2">
+      <TextBlock Classes="caption" Text="{Binding Label, RelativeSource={RelativeSource AncestorType=controls:MetricDisplay}}" />
+      <TextBlock FontSize="17" FontWeight="SemiBold" Text="{Binding Value, RelativeSource={RelativeSource AncestorType=controls:MetricDisplay}}" />
+    </StackPanel>
+  </Grid>
+</UserControl>

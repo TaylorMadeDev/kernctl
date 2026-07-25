@@ -1,0 +1,13 @@
+<UserControl
+    x:Class="Kernctl.App.Controls.LogoMark"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Width="34"
+    Height="34">
+  <Canvas Width="34" Height="34">
+    <Path Data="M17,2 L23,12 L17,22 L11,12 Z" Fill="{DynamicResource Brush.Accent}" />
+    <Path Data="M4,27 L10,17 L16,27 Z" Fill="#B8AFFF" />
+    <Path Data="M18,27 L24,17 L30,27 Z" Fill="#6F60E8" />
+    <Path Data="M11,29 L23,29 L17,19 Z" Fill="#8B7CFF" />
+  </Canvas>
+</UserControl>

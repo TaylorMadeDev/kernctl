@@ -1,0 +1,37 @@
+<UserControl
+    x:Class="Kernctl.App.Controls.ToolCard"
+    x:DataType="viewModels:ToolCardViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Kernctl.App.Controls"
+    xmlns:services="using:Kernctl.App.Services"
+    xmlns:viewModels="using:Kernctl.App.ViewModels">
+  <Border Classes="tool-card">
+    <Grid ColumnDefinitions="64,*,Auto">
+      <controls:SvgIcon
+          Width="38"
+          Height="38"
+          HorizontalAlignment="Left"
+          VerticalAlignment="Center"
+          IconBrush="{DynamicResource Brush.Accent}"
+          Source="{Binding Icon}" />
+      <StackPanel Grid.Column="1" Margin="0,0,18,0" VerticalAlignment="Center" Spacing="5">
+        <TextBlock Classes="heading" FontSize="17" Text="{Binding Title}" />
+        <TextBlock Classes="body" FontSize="14" Text="{Binding Description}" />
+      </StackPanel>
+      <ToggleSwitch
+          Grid.Column="2"
+          Classes="kernctl"
+          IsChecked="{Binding IsToggled}"
+          IsVisible="{Binding HasToggle}"
+          ToolTip.Tip="{Binding ToggleAccessibleLabel}" />
+      <controls:SvgIcon
+          Grid.Column="2"
+          Width="16"
+          Height="16"
+          IsVisible="{Binding HasNavigation}"
+          IconBrush="{DynamicResource Brush.Text.Primary}"
+          Source="{x:Static services:IconCatalog.Chevron}" />
+    </Grid>
+  </Border>
+</UserControl>

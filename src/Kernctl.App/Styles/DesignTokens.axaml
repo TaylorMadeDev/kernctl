@@ -1,0 +1,74 @@
+<ResourceDictionary
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Color x:Key="Color.Window">#090B0E</Color>
+  <Color x:Key="Color.Sidebar">#0C0F13</Color>
+  <Color x:Key="Color.Surface.Primary">#11151A</Color>
+  <Color x:Key="Color.Surface.Secondary">#151A20</Color>
+  <Color x:Key="Color.Border.Subtle">#202630</Color>
+  <Color x:Key="Color.Text.Primary">#F3F4F6</Color>
+  <Color x:Key="Color.Text.Secondary">#A0A7B2</Color>
+  <Color x:Key="Color.Text.Muted">#727B88</Color>
+  <Color x:Key="Color.Accent">#8B7CFF</Color>
+  <Color x:Key="Color.Accent.Hover">#9B8FFF</Color>
+  <Color x:Key="Color.Danger">#F06464</Color>
+  <Color x:Key="Color.Success">#68C78A</Color>
+  <Color x:Key="Color.Warning">#E5B567</Color>
+
+  <SolidColorBrush x:Key="Brush.Window" Color="{DynamicResource Color.Window}" />
+  <SolidColorBrush x:Key="Brush.Sidebar" Color="{DynamicResource Color.Sidebar}" />
+  <SolidColorBrush x:Key="Brush.Surface.Primary" Color="{DynamicResource Color.Surface.Primary}" />
+  <SolidColorBrush x:Key="Brush.Surface.Secondary" Color="{DynamicResource Color.Surface.Secondary}" />
+  <SolidColorBrush x:Key="Brush.Border.Subtle" Color="{DynamicResource Color.Border.Subtle}" />
+  <SolidColorBrush x:Key="Brush.Text.Primary" Color="{DynamicResource Color.Text.Primary}" />
+  <SolidColorBrush x:Key="Brush.Text.Secondary" Color="{DynamicResource Color.Text.Secondary}" />
+  <SolidColorBrush x:Key="Brush.Text.Muted" Color="{DynamicResource Color.Text.Muted}" />
+  <SolidColorBrush x:Key="Brush.Accent" Color="{DynamicResource Color.Accent}" />
+  <SolidColorBrush x:Key="Brush.Accent.Hover" Color="{DynamicResource Color.Accent.Hover}" />
+  <SolidColorBrush x:Key="Brush.Danger" Color="{DynamicResource Color.Danger}" />
+  <SolidColorBrush x:Key="Brush.Success" Color="{DynamicResource Color.Success}" />
+  <SolidColorBrush x:Key="Brush.Warning" Color="{DynamicResource Color.Warning}" />
+  <SolidColorBrush x:Key="Brush.Transparent" Color="Transparent" />
+  <SolidColorBrush x:Key="Brush.Focus" Color="#CC8B7CFF" />
+  <SolidColorBrush x:Key="Brush.Accent.Subtle" Color="#1F8B7CFF" />
+  <SolidColorBrush x:Key="Brush.Surface.Hover" Color="#1B2027" />
+  <SolidColorBrush x:Key="Brush.Surface.Pressed" Color="#202630" />
+  <SolidColorBrush x:Key="Brush.Overlay" Color="#B8090B0E" />
+
+  <!-- Override the SimpleTheme primitives used inside built-in control templates. -->
+  <SolidColorBrush x:Key="ThemeAccentBrush" Color="#8B7CFF" />
+  <SolidColorBrush x:Key="ThemeAccentBrush2" Color="#9B8FFF" />
+  <SolidColorBrush x:Key="ThemeAccentBrush3" Color="#6658D8" />
+  <SolidColorBrush x:Key="ThemeAccentBrush4" Color="#338B7CFF" />
+  <SolidColorBrush x:Key="HighlightBrush" Color="#338B7CFF" />
+  <SolidColorBrush x:Key="HighlightBrush2" Color="#558B7CFF" />
+  <SolidColorBrush x:Key="HighlightForegroundBrush" Color="#F3F4F6" />
+
+  <FontFamily x:Key="Font.Family">Segoe UI Variable, Segoe UI</FontFamily>
+
+  <x:Double x:Key="Space.1">4</x:Double>
+  <x:Double x:Key="Space.2">8</x:Double>
+  <x:Double x:Key="Space.3">12</x:Double>
+  <x:Double x:Key="Space.4">16</x:Double>
+  <x:Double x:Key="Space.5">20</x:Double>
+  <x:Double x:Key="Space.6">24</x:Double>
+  <x:Double x:Key="Space.8">32</x:Double>
+  <x:Double x:Key="Space.10">40</x:Double>
+  <x:Double x:Key="Space.12">48</x:Double>
+
+  <CornerRadius x:Key="Radius.Small">6</CornerRadius>
+  <CornerRadius x:Key="Radius.Medium">10</CornerRadius>
+  <CornerRadius x:Key="Radius.Large">14</CornerRadius>
+  <CornerRadius x:Key="Radius.Window">12</CornerRadius>
+
+  <x:Double x:Key="Icon.Small">16</x:Double>
+  <x:Double x:Key="Icon.Medium">22</x:Double>
+  <x:Double x:Key="Icon.Large">32</x:Double>
+  <x:Double x:Key="Control.Height">44</x:Double>
+  <x:Double x:Key="TitleBar.Height">68</x:Double>
+  <x:Double x:Key="Sidebar.Width">278</x:Double>
+  <x:Double x:Key="Window.Width">1450</x:Double>
+  <x:Double x:Key="Window.Height">900</x:Double>
+  <x:Double x:Key="Window.MinWidth">1050</x:Double>
+  <x:Double x:Key="Window.MinHeight">680</x:Double>
+</ResourceDictionary>

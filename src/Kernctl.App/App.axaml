@@ -1,0 +1,28 @@
+<Application
+    x:Class="Kernctl.App.App"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pages="using:Kernctl.App.ViewModels.Pages"
+    xmlns:views="using:Kernctl.App.Views">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="/Styles/DesignTokens.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+
+  <Application.Styles>
+    <SimpleTheme />
+    <StyleInclude Source="/Styles/Controls.axaml" />
+  </Application.Styles>
+
+  <Application.DataTemplates>
+    <DataTemplate DataType="pages:GamingPageViewModel">
+      <views:GamingPage />
+    </DataTemplate>
+    <DataTemplate DataType="pages:PlaceholderPageViewModel">
+      <views:PlaceholderPage />
+    </DataTemplate>
+  </Application.DataTemplates>
+</Application>

@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Simple" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kernctl.Core\Kernctl.Core.csproj" />
+    <ProjectReference Include="..\Kernctl.Platform.Windows\Kernctl.Platform.Windows.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="..\..\svgs\solid\house.svg" Link="Assets\Icons\solid\house.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\hard-drive.svg" Link="Assets\Icons\solid\hard-drive.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\gamepad.svg" Link="Assets\Icons\solid\gamepad.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\gauge-high.svg" Link="Assets\Icons\solid\gauge-high.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\globe.svg" Link="Assets\Icons\solid\globe.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\grip.svg" Link="Assets\Icons\solid\grip.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\gear.svg" Link="Assets\Icons\solid\gear.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\search.svg" Link="Assets\Icons\solid\search.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\minus.svg" Link="Assets\Icons\solid\minus.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\window-maximize.svg" Link="Assets\Icons\solid\window-maximize.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\xmark.svg" Link="Assets\Icons\solid\xmark.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\rocket.svg" Link="Assets\Icons\solid\rocket.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\microchip.svg" Link="Assets\Icons\solid\microchip.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\display.svg" Link="Assets\Icons\solid\display.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\circle-user.svg" Link="Assets\Icons\solid\circle-user.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\chart-simple.svg" Link="Assets\Icons\solid\chart-simple.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\memory.svg" Link="Assets\Icons\solid\memory.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\bolt.svg" Link="Assets\Icons\solid\bolt.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\angle-right.svg" Link="Assets\Icons\solid\angle-right.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\battery-half.svg" Link="Assets\Icons\solid\battery-half.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\shield-halved.svg" Link="Assets\Icons\solid\shield-halved.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\crosshairs.svg" Link="Assets\Icons\solid\crosshairs.svg" />
+    <AvaloniaResource Include="..\..\svgs\solid\leaf.svg" Link="Assets\Icons\solid\leaf.svg" />
+  </ItemGroup>
+</Project>
