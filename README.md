@@ -4,8 +4,9 @@
 
 kernctl is an early-stage Windows control centre for storage, gaming, performance,
 network, application, and safe system-management workflows. This milestone provides
-the repository architecture, a polished non-destructive Avalonia UI, and a complete
-runtime theme customizer under **Settings → Appearance**.
+the repository architecture, a polished non-destructive Avalonia UI, a complete
+runtime theme customizer under **Settings → Appearance**, and the transactional
+safety engine that all future system actions must use.
 
 > [!IMPORTANT]
 > kernctl is not production-ready. All profile and tool interactions in this
@@ -57,6 +58,29 @@ dotnet run --project src/Kernctl.App/Kernctl.App.csproj
 - MVVM separation with cached page state and dependency injection.
 - Honest UI: sample values and unavailable modules are identified explicitly.
 - Runtime themes update shared Avalonia resources without recreating pages or restarting.
+- Future changes run through versioned plans, durable rollback snapshots, verification,
+  reverse-order recovery, and structured history.
+
+## Transactional action safety
+
+kernctl now has a platform-independent transaction engine for future optimizations.
+It supports ordered action groups, dry runs, cooperative cancellation, one mutating
+transaction at a time, persistent journals, reverse rollback, crash discovery, and
+read-only history. Action review, progress, and startup recovery UI foundations are
+present, but no production system actions are registered.
+
+Journals are stored without elevation under:
+
+```text
+%LocalAppData%/kernctl/transactions/
+├── active/
+│   └── <transaction-id>.json
+└── archive/
+    └── <transaction-id>.json
+```
+
+See [Action engine and rollback safety](docs/action-engine.md) for the lifecycle,
+state machines, journal format, and future action requirements.
 
 ## Theme customization
 
@@ -82,16 +106,18 @@ or personal information.
 ## Safety principles
 
 - The UI process does not run permanently elevated.
-- No registry, service, power-plan, driver, or user-file changes are implemented.
-- Future actions must detect, explain, apply, verify, and support rollback.
+- No registry, service, power-plan, driver, network, process, or user-file changes are
+  implemented by the action engine milestone.
+- Future actions must detect, plan, validate, snapshot, apply, verify, and report an
+  honest committed or rollback state.
 - Sensitive credentials, cookies, and tokens are never collected or logged.
 
 ## Roadmap
 
 1. Add automated visual regression coverage for the shell and theme editor.
 2. Add read-only Windows hardware and storage inventory.
-3. Implement a transactional action engine with explicit rollback.
-4. Design a restricted broker for narrowly approved privileged operations.
+3. Add the first read-only detections and reviewed mock-backed action workflow.
+4. Design a restricted broker for narrowly approved administrator operations.
 
 ## Assets and attribution
 

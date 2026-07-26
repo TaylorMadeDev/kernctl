@@ -81,6 +81,18 @@ own track and thumb template instead of inheriting the operating-system accent.
 Focus uses a visible violet outline. State is always reinforced by text, shape, or
 position rather than colour alone.
 
+Action safety surfaces reuse these foundations:
+
+- `ActionReviewDialog` lists proposed operations, resources, rollback, privilege,
+  restart, warnings, and dry-run choice before execution.
+- `ActionProgressPanel` reports real lifecycle stages and exact completed-action
+  counts; it remains indeterminate when a meaningful total is unavailable.
+- `ActionRecoveryDialog` describes interrupted journal evidence and labels possible
+  manual intervention with both text and styling.
+
+High-risk and rollback states never rely on colour alone. Production navigation does
+not expose deterministic test actions.
+
 The desktop window uses native operating-system decorations. The content shell starts
 at a compact 1220×760 and supports a 900×600 minimum. Tool cards use an adaptive panel:
 three columns when space permits, two at medium widths, and one on narrow layouts.

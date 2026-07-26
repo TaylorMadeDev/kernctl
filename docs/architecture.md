@@ -62,6 +62,48 @@ The Avalonia storage provider supplies native open/save pickers. Imports are lim
 to 256 KB, parsed only as JSON data, fully validated, and assigned a new local ID.
 Exports contain only the selected `ThemeDefinition`.
 
+## Transactional action architecture
+
+The original proof-of-concept action abstraction has been replaced by one safety
+pipeline in `Kernctl.Core.Actions`:
+
+```text
+Avalonia review/progress/recovery view models
+                    ↓ contracts only
+IActionTransactionEngine
+    plan + dry run + execute + cancel + rollback + recover
+                    ↓
+ISystemAction registry                  IActionJournalStore
+    stable metadata                       active journals
+    detect / plan / validate              atomic snapshots
+    capture / apply / verify               archived history
+    rollback
+                    ↓ future implementation
+Kernctl.Platform.Windows → restricted broker when administrator approval is needed
+```
+
+Plans use immutable collections and are checked against the registered action ID and
+schema version before execution. Detection, planning, and validation run for the full
+ordered group before mutation. The process-wide engine lock permits only one mutating
+transaction, while dry runs never enter capture or apply.
+
+Every action captures an explicit JSON payload. The engine rejects secret-like fields
+and unsafe polymorphic metadata, enforces a 256 KB payload limit, adds transaction and
+action ownership, computes SHA-256 integrity metadata, writes the journal atomically,
+and only then calls `ApplyAsync`.
+
+Action and transaction states are persisted as typed enums after every transition.
+Verification failure, apply failure that may have partially changed state, or
+cancellation after mutation triggers reverse-order rollback with an independent
+recovery cancellation path. One rollback failure does not stop attempts for earlier
+actions; the result becomes `PartiallyRolledBack`.
+
+Production journals use
+`%LocalAppData%/kernctl/transactions/{active,archive}`. Startup recovery scans active
+journals and exposes a decision through `ActionRecoveryViewModel`; it never silently
+resumes apply. Completed journals are archived and reduced to sanitized read-only
+history entries. See [action-engine.md](action-engine.md) for the complete contract.
+
 ## Future safety boundary
 
 ```text
@@ -79,27 +121,12 @@ small, versioned allow-list of operations, validate every input, authenticate th
 calling process, and return structured results. It will not accept arbitrary
 commands, registry paths, service names, or file paths.
 
-## Safe action lifecycle
-
-Every future system action implements a lifecycle equivalent to:
-
-1. Detect current state.
-2. Explain the proposed change and evidence.
-3. Declare privilege and restart requirements.
-4. Capture rollback state.
-5. Apply the narrow change.
-6. Verify the observed result.
-7. Undo from captured state.
-8. Report a structured outcome without sensitive data.
-
-Profiles are transactional. Actions apply in order; if one fails, already-applied
-actions undo in reverse order. Rollback failure must be surfaced prominently and
-must never be swallowed.
-
 ## Current milestone
 
 Profile selection, toggles, search, navigation, modal state, and tool interactions
 remain in-memory only. Theme preferences are the sole persisted application state and
 stay inside the current user's local application-data directory. Metrics are deliberately
-labelled sample values. No privileged, registry, service, power-plan, or unrelated
-user-file code exists.
+labelled sample values. The transaction engine persists only plans, mock-action
+snapshots, lifecycle state, and sanitized history; no production action is registered.
+No privileged, registry, service, power-plan, process, network, or unrelated user-file
+mutation code exists.
