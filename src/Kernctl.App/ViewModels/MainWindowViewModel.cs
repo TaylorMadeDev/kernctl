@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Kernctl.App.Services;
 using Kernctl.App.ViewModels.Actions;
 using Kernctl.App.ViewModels.Pages;
+using Kernctl.App.ViewModels.Profiles;
 
 namespace Kernctl.App.ViewModels;
 
@@ -92,6 +93,8 @@ public sealed class MainWindowViewModel : ObservableObject
     public IReadOnlyList<NavigationItemViewModel> NavigationItems { get; }
 
     public GamingPageViewModel Gaming { get; }
+
+    public ProfileManagerViewModel? Profiles => Gaming.ProfileManager;
 
     public SettingsPageViewModel Settings { get; }
 

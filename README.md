@@ -6,11 +6,14 @@ kernctl is an early-stage Windows control centre for storage, gaming, performanc
 network, application, and safe system-management workflows. This milestone provides
 the repository architecture, a polished non-destructive Avalonia UI, a complete
 runtime theme customizer under **Settings → Appearance**, the transactional safety
-engine, and a restricted short-lived Windows elevation broker.
+engine, a restricted short-lived Windows elevation broker, and a safe transactional
+system-profile builder.
 
 > [!IMPORTANT]
-> kernctl is not production-ready. All profile and tool interactions in this
-> milestone are in-memory only and do not modify Windows.
+> kernctl is not production-ready. A manually confirmed profile may select one of
+> three existing Windows power schemes through the supported Windows API. No scheme
+> values, registry settings, services, security controls, or arbitrary processes are
+> modified.
 
 ## Design reference
 
@@ -71,7 +74,8 @@ kernctl now has a platform-independent transaction engine for future optimizatio
 It supports ordered action groups, dry runs, cooperative cancellation, one mutating
 transaction at a time, persistent journals, reverse rollback, crash discovery, and
 read-only history. Action review, progress, and startup recovery UI foundations are
-present, but no production system actions are registered.
+present; the only production system action selects a known existing Windows power
+scheme for the current user.
 
 Journals are stored without elevation under:
 
@@ -85,6 +89,20 @@ Journals are stored without elevation under:
 
 See [Action engine and rollback safety](docs/action-engine.md) for the lifecycle,
 state machines, journal format, and future action requirements.
+
+## System profiles
+
+`Change Profile` now opens the profile browser, details, builder, application-plan,
+result, rollback, and history workflow. Battery Saver, Balanced, Gaming, and
+Competitive are immutable built-ins; custom profiles use validated typed actions and
+atomic versioned JSON. A profile becomes active only after every required action
+commits.
+
+The first reversible Windows operation selects an existing known power scheme using
+`PowerGetActiveScheme`/`PowerSetActiveScheme`; the exact previous GUID is snapshotted
+and restored on rollback. kernctl-only monitoring and preference actions are also
+transactional. See [System profiles](docs/system-profiles.md) for the model, UI,
+trigger decisions, persistence, and intentional limitations.
 
 ## Restricted elevation broker
 
@@ -123,19 +141,20 @@ or personal information.
 ## Safety principles
 
 - The UI process does not run permanently elevated.
-- No registry, service, power-plan, driver, network, process, or user-file changes are
-  implemented by the action engine milestone.
+- No registry, service, power-plan editing, driver, network, arbitrary-process, or
+  unrelated user-file changes are implemented. Profile application may select an
+  existing known Windows power scheme after explicit review.
 - Future actions must detect, plan, validate, snapshot, apply, verify, and report an
   honest committed or rollback state.
 - Sensitive credentials, cookies, and tokens are never collected or logged.
 
 ## Roadmap
 
-1. Add automated visual regression coverage for the shell and theme editor.
-2. Add read-only Windows hardware and storage inventory.
-3. Add the first read-only detections and reviewed mock-backed action workflow.
-4. Add the first reviewed, reversible Windows operation to the existing broker
-   allowlist only after its isolated platform implementation and rollback tests exist.
+1. Add automated visual regression coverage for the shell and profile/theme editors.
+2. Add unelevated typed Windows event sources for approved automatic profile triggers.
+3. Add read-only Windows hardware and storage inventory.
+4. Add any future privileged action to the broker allowlist only after isolated
+   platform implementation, verification, and rollback tests exist.
 
 ## Assets and attribution
 

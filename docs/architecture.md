@@ -7,7 +7,7 @@ portable state and contracts. `Kernctl.Broker.Protocol` contains strict DTOs and
 framing rules, `Kernctl.Broker.Client` owns UAC launch and the unelevated pipe client,
 and the separate `Kernctl.Broker` executable owns verification and dispatch.
 `Kernctl.Platform.Windows` still implements only harmless, read-only Windows services
-during this milestone.
+plus the narrow reversible current-user power-scheme adapter.
 
 Dependencies point inward:
 
@@ -129,13 +129,34 @@ JSON protocol, a secured local-only named pipe, OS-backed client process verific
 bounded lifetimes and request counts, and exact operation registration. It does not
 accept arbitrary commands, scripts, registry paths, service names, or file paths.
 
+## System profile architecture
+
+```text
+Profile workspace view models
+          ↓
+IProfileCatalogService ── ProfileStore (versioned atomic JSON)
+          ↓
+IProfileEngine ───────── ProfileHistoryStore (sanitized outcomes)
+          ↓
+IActionTransactionEngine
+          ↓
+fixed typed actions
+    ├── kernctl feature state
+    └── IPowerSchemeService → PowrProf.dll
+```
+
+Profiles contain ordered typed definitions and fixed target keys. Validation rejects
+duplicate targets before planning. `IProfileEngine` resolves definitions only to
+pre-registered action IDs and delegates all snapshot, mutation, verification,
+cancellation, and rollback work to the existing action engine. See
+[system-profiles.md](system-profiles.md).
+
 ## Current milestone
 
-Profile selection, toggles, search, navigation, modal state, and tool interactions
-remain in-memory only. Theme preferences are the sole persisted application state and
-stay inside the current user's local application-data directory. Metrics are deliberately
-labelled sample values. The transaction engine persists only plans, mock-action
-snapshots, lifecycle state, and sanitized history; no production action is registered.
-The elevated broker contains only non-mutating information, capability, ping, and
-shutdown diagnostics. No registry, service, power-plan, process, network, or
-unrelated user-file mutation code exists.
+Profiles, profile history, active selection, and theme preferences are persisted in
+the current user's local application-data directory. Metrics remain deliberately
+labelled sample values. Production actions are limited to existing known Windows
+power-scheme selection and two kernctl-local Boolean settings. The elevated broker
+still contains only non-mutating information, capability, ping, and shutdown
+diagnostics. No registry, service, power-scheme editing, arbitrary process, network,
+or unrelated user-file mutation code exists.

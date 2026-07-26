@@ -7,9 +7,10 @@ engine in `Kernctl.Core.Actions`. The engine controls lifecycle, persistence,
 cancellation, verification, rollback, history, and recovery. An action owns only its
 narrow detection and platform operation.
 
-This milestone registers no production system actions. Test actions change only
-in-memory state or isolated temporary directories. No registry, service, power-plan,
-process, network, or user-file mutation was added.
+The profile milestone registers one bounded Windows action family for selecting an
+existing known power scheme and two kernctl-local setting families. Every one uses
+this lifecycle. No registry, service, power-scheme editing, arbitrary process,
+network, or unrelated user-file mutation was added.
 
 ## Required lifecycle
 

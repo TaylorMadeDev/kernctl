@@ -1,0 +1,522 @@
+<UserControl
+    x:Class="Kernctl.App.Views.ProfileWorkspace"
+    x:CompileBindings="False"
+    x:DataType="profiles:ProfileManagerViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Kernctl.App.Controls"
+    xmlns:coreProfiles="using:Kernctl.Core.Profiles"
+    xmlns:profiles="using:Kernctl.App.ViewModels.Profiles">
+  <Border
+      MaxWidth="1080"
+      MaxHeight="720"
+      Margin="{DynamicResource Inset.6}"
+      HorizontalAlignment="Stretch"
+      VerticalAlignment="Stretch"
+      Background="{DynamicResource Brush.Window}"
+      BorderBrush="{DynamicResource Brush.Border.Strong}"
+      BorderThickness="1"
+      CornerRadius="{DynamicResource Radius.Large}">
+    <Grid RowDefinitions="Auto,*,Auto">
+      <Border
+          Padding="{DynamicResource Inset.5}"
+          BorderBrush="{DynamicResource Brush.Border.Subtle}"
+          BorderThickness="0,0,0,1">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space.3}">
+          <Button
+              Classes="subtle"
+              Command="{Binding BackCommand}"
+              Content="Back"
+              IsVisible="{Binding !IsBrowserVisible}" />
+          <StackPanel Grid.Column="1" Spacing="{DynamicResource Space.1}">
+            <TextBlock Classes="heading" Text="System profiles" />
+            <TextBlock
+                Classes="body"
+                Text="Preview every change, apply transactionally, and restore the captured state." />
+          </StackPanel>
+          <Button
+              Grid.Column="2"
+              Classes="subtle"
+              Command="{Binding CloseCommand}"
+              Content="Close" />
+        </Grid>
+      </Border>
+
+      <Grid Grid.Row="1">
+        <Grid
+            Margin="{DynamicResource Inset.5}"
+            RowDefinitions="Auto,*"
+            RowSpacing="{DynamicResource Space.4}"
+            IsVisible="{Binding IsBrowserVisible}">
+          <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="{DynamicResource Space.2}">
+            <StackPanel Spacing="{DynamicResource Space.1}">
+              <TextBlock Classes="display" Text="Choose a profile" />
+              <TextBlock Classes="body" Text="Built-ins are immutable. Duplicate one to customize it." />
+            </StackPanel>
+            <Button
+                Grid.Column="1"
+                Classes="subtle"
+                Command="{Binding ShowHistoryCommand}"
+                Content="History" />
+            <Button
+                Grid.Column="2"
+                Classes="subtle"
+                Command="{Binding ImportCommand}"
+                Content="Import" />
+            <Button
+                Grid.Column="3"
+                Command="{Binding NewProfileCommand}"
+                Content="New profile" />
+          </Grid>
+          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding Profiles}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <controls:AdaptiveCardPanel
+                      HorizontalSpacing="{DynamicResource Grid.Gap}"
+                      MaximumColumns="3"
+                      MinimumItemWidth="250"
+                      VerticalSpacing="{DynamicResource Grid.Gap}" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="profiles:ProfileCardViewModel">
+                  <Border Classes="profile-card">
+                    <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="{DynamicResource Space.3}">
+                      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{DynamicResource Space.3}">
+                        <Border
+                            Width="38"
+                            Height="38"
+                            Background="{DynamicResource Brush.Accent.Subtle}"
+                            CornerRadius="{DynamicResource Radius.Small}">
+                          <controls:SvgIcon
+                              Width="19"
+                              Height="19"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              IconBrush="{DynamicResource Brush.Accent}"
+                              Source="{Binding Icon}" />
+                        </Border>
+                        <StackPanel Grid.Column="1" Spacing="{DynamicResource Space.1}">
+                          <TextBlock Classes="heading" Text="{Binding Name}" />
+                          <TextBlock
+                              Classes="caption"
+                              Foreground="{DynamicResource Brush.Success}"
+                              IsVisible="{Binding IsActive}"
+                              Text="ACTIVE" />
+                        </StackPanel>
+                        <TextBlock
+                            Grid.Column="2"
+                            Classes="caption"
+                            Text="{Binding SupportStatus}" />
+                      </Grid>
+                      <TextBlock Grid.Row="1" Classes="body" Text="{Binding Description}" />
+                      <StackPanel Grid.Row="2" Spacing="{DynamicResource Space.1}">
+                        <TextBlock Classes="caption" Text="{Binding ActionCountText}" />
+                        <TextBlock Classes="caption" Text="{Binding AutomaticStatus}" />
+                      </StackPanel>
+                      <Grid
+                          Grid.Row="3"
+                          ColumnDefinitions="*,Auto,Auto"
+                          ColumnSpacing="{DynamicResource Space.2}"
+                          VerticalAlignment="Bottom">
+                        <Button
+                            Classes="subtle"
+                            Command="{Binding DataContext.ShowDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            Content="Details" />
+                        <Button
+                            Grid.Column="1"
+                            Classes="outline"
+                            Command="{Binding DataContext.PreviewCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            Content="Preview" />
+                        <Button
+                            Grid.Column="2"
+                            Command="{Binding DataContext.PreviewCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            Content="Apply" />
+                      </Grid>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </Grid>
+
+        <ScrollViewer IsVisible="{Binding IsDetailsVisible}" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Margin="{DynamicResource Inset.5}" Spacing="{DynamicResource Space.5}">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="{DynamicResource Space.2}">
+              <StackPanel Spacing="{DynamicResource Space.1}">
+                <TextBlock Classes="display" Text="{Binding SelectedProfile.Name}" />
+                <TextBlock Classes="body" Text="{Binding SelectedProfile.Description}" />
+              </StackPanel>
+              <Button
+                  Grid.Column="1"
+                  Classes="subtle"
+                  Command="{Binding DuplicateCommand}"
+                  CommandParameter="{Binding SelectedProfile}"
+                  Content="Duplicate" />
+              <Button
+                  Grid.Column="2"
+                  Classes="subtle"
+                  Command="{Binding EditCommand}"
+                  CommandParameter="{Binding SelectedProfile}"
+                  Content="Edit"
+                  IsVisible="{Binding !SelectedProfile.IsBuiltIn}" />
+              <Button
+                  Grid.Column="3"
+                  Command="{Binding PreviewCommand}"
+                  CommandParameter="{Binding SelectedProfile}"
+                  Content="Preview plan" />
+            </Grid>
+            <Border Classes="profile-card">
+              <StackPanel Spacing="{DynamicResource Space.3}">
+                <TextBlock Classes="heading" Text="Configured actions" />
+                <ItemsControl ItemsSource="{Binding SelectedProfile.Profile.OrderedActions}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="coreProfiles:ProfileActionDefinition">
+                      <Grid
+                          Margin="0,4"
+                          ColumnDefinitions="*,Auto"
+                          ColumnSpacing="{DynamicResource Space.3}">
+                        <TextBlock Classes="label" Text="{Binding Kind}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Classes="caption"
+                            Text="{Binding TargetKey}" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+            <Border Classes="profile-card">
+              <StackPanel Spacing="{DynamicResource Space.2}">
+                <TextBlock Classes="heading" Text="Automatic behaviour" />
+                <TextBlock
+                    Classes="body"
+                    Text="{Binding SelectedProfile.AutomaticStatus}" />
+                <TextBlock
+                    Classes="caption"
+                    Text="Automatic application is opt-in and must be approved at least once." />
+              </StackPanel>
+            </Border>
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{DynamicResource Space.2}">
+              <Button
+                  Grid.Column="1"
+                  Classes="danger-outline"
+                  Command="{Binding DeleteCommand}"
+                  CommandParameter="{Binding SelectedProfile}"
+                  Content="Delete custom profile"
+                  IsVisible="{Binding !SelectedProfile.IsBuiltIn}" />
+              <Button
+                  Grid.Column="2"
+                  Classes="subtle"
+                  Command="{Binding ExportCommand}"
+                  CommandParameter="{Binding SelectedProfile}"
+                  Content="Export"
+                  IsVisible="{Binding !SelectedProfile.IsBuiltIn}" />
+            </Grid>
+          </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer IsVisible="{Binding IsEditorVisible}" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Margin="{DynamicResource Inset.5}" Spacing="{DynamicResource Space.5}">
+            <StackPanel Spacing="{DynamicResource Space.1}">
+              <TextBlock Classes="display" Text="Profile builder" />
+              <TextBlock Classes="body" Text="Custom profiles are validated before they can be saved." />
+            </StackPanel>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="{DynamicResource Grid.Gap}">
+              <StackPanel Spacing="{DynamicResource Space.2}">
+                <TextBlock Classes="label" Text="Name" />
+                <TextBox Text="{Binding EditorName, Mode=TwoWay}" />
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="{DynamicResource Space.2}">
+                <TextBlock Classes="label" Text="Description" />
+                <TextBox Text="{Binding EditorDescription, Mode=TwoWay}" />
+              </StackPanel>
+            </Grid>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="{DynamicResource Grid.Gap}">
+              <StackPanel Spacing="{DynamicResource Space.2}">
+                <TextBlock Classes="label" Text="Icon" />
+                <ComboBox ItemsSource="{Binding AvailableIcons}" SelectedItem="{Binding EditorIcon}" />
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="{DynamicResource Space.2}">
+                <TextBlock Classes="label" Text="Accent" />
+                <ComboBox ItemsSource="{Binding AvailableAccents}" SelectedItem="{Binding EditorAccent}" />
+              </StackPanel>
+            </Grid>
+            <Border Classes="profile-card">
+              <StackPanel Spacing="{DynamicResource Space.3}">
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="{DynamicResource Space.2}">
+                  <StackPanel>
+                    <TextBlock Classes="heading" Text="Ordered actions" />
+                    <TextBlock Classes="caption" Text="Each setting can appear only once." />
+                  </StackPanel>
+                  <Button
+                      Grid.Column="1"
+                      Classes="subtle"
+                      Command="{Binding AddPowerActionCommand}"
+                      Content="+ Power" />
+                  <Button
+                      Grid.Column="2"
+                      Classes="subtle"
+                      Command="{Binding AddMonitoringActionCommand}"
+                      Content="+ Monitoring" />
+                  <Button
+                      Grid.Column="3"
+                      Classes="subtle"
+                      Command="{Binding AddPreferenceActionCommand}"
+                      Content="+ Preference" />
+                </Grid>
+                <ItemsControl ItemsSource="{Binding EditorActions}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="profiles:ProfileActionEditorViewModel">
+                      <Grid
+                          Margin="0,4"
+                          ColumnDefinitions="180,*,Auto,Auto,Auto,Auto"
+                          ColumnSpacing="{DynamicResource Space.2}">
+                        <TextBlock VerticalAlignment="Center" Classes="label" Text="{Binding Name}" />
+                        <ComboBox
+                            Grid.Column="1"
+                            ItemsSource="{Binding Values}"
+                            SelectedItem="{Binding SelectedValue, Mode=TwoWay}" />
+                        <CheckBox
+                            Grid.Column="2"
+                            VerticalAlignment="Center"
+                            Content="Required"
+                            IsChecked="{Binding IsRequired}" />
+                        <Button
+                            Grid.Column="3"
+                            Classes="subtle"
+                            Command="{Binding DataContext.MoveActionUpCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            Content="Move up" />
+                        <Button
+                            Grid.Column="4"
+                            Classes="subtle"
+                            Command="{Binding DataContext.MoveActionDownCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            Content="Move down" />
+                        <Button
+                            Grid.Column="5"
+                            Classes="danger-outline"
+                            Command="{Binding DataContext.RemoveActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            Content="Remove" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+            <Border Classes="profile-card">
+              <StackPanel Spacing="{DynamicResource Space.3}">
+                <TextBlock Classes="heading" Text="Automatic switching" />
+                <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{DynamicResource Space.4}">
+                  <CheckBox Content="Enable automatic switching" IsChecked="{Binding EditorAutomaticEnabled}" />
+                  <CheckBox
+                      Grid.Column="1"
+                      Content="I approve this profile's automatic behaviour"
+                      IsChecked="{Binding EditorAutomaticApproved}" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space.2}">
+                  <TextBox
+                      IsReadOnly="True"
+                      Text="{Binding EditorGamePath}"
+                      PlaceholderText="No game executable assigned" />
+                  <Button
+                      Grid.Column="1"
+                      Classes="subtle"
+                      Command="{Binding SelectGameCommand}"
+                      Content="Select game…" />
+                </Grid>
+                <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="{DynamicResource Grid.Gap}">
+                  <StackPanel Spacing="{DynamicResource Space.1}">
+                    <TextBlock Classes="caption" Text="Priority (0–100)" />
+                    <NumericUpDown Minimum="0" Maximum="100" Value="{Binding EditorTriggerPriority}" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="1" Spacing="{DynamicResource Space.1}">
+                    <TextBlock Classes="caption" Text="Cooldown seconds" />
+                    <NumericUpDown Minimum="5" Maximum="3600" Value="{Binding EditorCooldownSeconds}" />
+                  </StackPanel>
+                  <CheckBox
+                      Grid.Column="2"
+                      VerticalAlignment="Bottom"
+                      Content="Restore after game exits"
+                      IsChecked="{Binding EditorRestoreAfterGameExit}" />
+                </Grid>
+              </StackPanel>
+            </Border>
+            <TextBlock Classes="validation" Text="{Binding ValidationMessage}" />
+            <Grid ColumnDefinitions="*,Auto">
+              <Button
+                  Grid.Column="1"
+                  Command="{Binding SaveEditorCommand}"
+                  Content="Validate and save" />
+            </Grid>
+          </StackPanel>
+        </ScrollViewer>
+
+        <Grid
+            Margin="{DynamicResource Inset.5}"
+            RowDefinitions="Auto,*,Auto"
+            RowSpacing="{DynamicResource Space.4}"
+            IsVisible="{Binding IsPlanVisible}">
+          <StackPanel Spacing="{DynamicResource Space.1}">
+            <TextBlock Classes="display" Text="Review application plan" />
+            <TextBlock Classes="body" Text="{Binding StatusMessage}" />
+          </StackPanel>
+          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding PlanItems}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="profiles:ProfilePlanItemViewModel">
+                  <Border Classes="profile-card" Margin="0,0,0,10">
+                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="{DynamicResource Space.2}">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="heading" Text="{Binding Name}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Classes="caption"
+                            Foreground="{DynamicResource Brush.Accent}"
+                            Text="{Binding Status}" />
+                      </Grid>
+                      <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="{DynamicResource Grid.Gap}">
+                        <StackPanel>
+                          <TextBlock Classes="caption" Text="CURRENT VALUE" />
+                          <TextBlock Classes="body" Text="{Binding CurrentValue}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                          <TextBlock Classes="caption" Text="PROPOSED VALUE" />
+                          <TextBlock Classes="body" Text="{Binding ProposedValue}" />
+                        </StackPanel>
+                      </Grid>
+                      <StackPanel Grid.Row="2" Spacing="{DynamicResource Space.1}">
+                        <TextBlock Classes="body" Text="{Binding Explanation}" />
+                        <TextBlock Classes="caption" Text="{Binding Reversibility}" />
+                        <TextBlock Classes="caption" Text="{Binding Privilege}" />
+                        <TextBlock Classes="validation" Text="{Binding Messages}" />
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+          <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space.4}">
+            <CheckBox
+                VerticalAlignment="Center"
+                Content="I reviewed every action and explicitly confirm this plan"
+                IsChecked="{Binding IsConfirmationChecked}" />
+            <Button
+                Grid.Column="1"
+                Command="{Binding ConfirmApplyCommand}"
+                Content="Apply transaction"
+                IsEnabled="{Binding CanConfirmApply}" />
+          </Grid>
+        </Grid>
+
+        <ScrollViewer IsVisible="{Binding IsResultVisible}" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Margin="{DynamicResource Inset.5}" Spacing="{DynamicResource Space.5}">
+            <StackPanel Spacing="{DynamicResource Space.2}">
+              <TextBlock Classes="display" Text="Profile result" />
+              <TextBlock Classes="heading" Text="{Binding LastResult.Outcome}" />
+              <TextBlock Classes="body" Text="{Binding StatusMessage}" />
+            </StackPanel>
+            <ItemsControl ItemsSource="{Binding LastResult.Actions}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="coreProfiles:ProfileActionResult">
+                  <Border Classes="profile-card" Margin="0,0,0,10">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Spacing="{DynamicResource Space.1}">
+                        <TextBlock Classes="label" Text="{Binding FriendlyName}" />
+                        <TextBlock Classes="body" Text="{Binding Summary}" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="1" Classes="caption" Text="{Binding Succeeded}" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="{DynamicResource Space.2}">
+              <Button
+                  Grid.Column="1"
+                  Classes="danger-outline"
+                  Command="{Binding RestorePreviousCommand}"
+                  Content="Restore previous state" />
+              <Button
+                  Grid.Column="2"
+                  Classes="subtle"
+                  Command="{Binding ShowDetailsCommand}"
+                  CommandParameter="{Binding SelectedProfile}"
+                  Content="View details" />
+              <Button
+                  Grid.Column="3"
+                  Command="{Binding CloseCommand}"
+                  Content="Keep profile" />
+            </Grid>
+          </StackPanel>
+        </ScrollViewer>
+
+        <Grid
+            Margin="{DynamicResource Inset.5}"
+            RowDefinitions="Auto,*"
+            RowSpacing="{DynamicResource Space.4}"
+            IsVisible="{Binding IsHistoryVisible}">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel>
+              <TextBlock Classes="display" Text="Profile history" />
+              <TextBlock Classes="body" Text="Sanitized profile outcomes and rollback status." />
+            </StackPanel>
+            <Button
+                Grid.Column="1"
+                Classes="danger-outline"
+                Command="{Binding ClearHistoryCommand}"
+                Content="Clear history" />
+          </Grid>
+          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding History}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="profiles:ProfileHistoryItemViewModel">
+                  <Border Classes="profile-card" Margin="0,0,0,10">
+                    <Grid ColumnDefinitions="2*,*,*,*,*,*" ColumnSpacing="{DynamicResource Grid.Gap}">
+                      <StackPanel>
+                        <TextBlock Classes="label" Text="{Binding ProfileName}" />
+                        <TextBlock Classes="caption" Text="{Binding Trigger}" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="1" Classes="body" Text="{Binding Started}" />
+                      <TextBlock Grid.Column="2" Classes="body" Text="{Binding Ended}" />
+                      <TextBlock Grid.Column="3" Classes="body" Text="{Binding Outcome}" />
+                      <TextBlock Grid.Column="4" Classes="body" Text="{Binding ActionSummary}" />
+                      <TextBlock Grid.Column="5" Classes="body" Text="{Binding Rollback}" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </Grid>
+      </Grid>
+
+      <Border
+          Grid.Row="2"
+          Padding="{DynamicResource Inset.3}"
+          BorderBrush="{DynamicResource Brush.Border.Subtle}"
+          BorderThickness="0,1,0,0">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock
+              VerticalAlignment="Center"
+              Classes="caption"
+              Text="{Binding StatusMessage}" />
+          <ProgressBar
+              Grid.Column="1"
+              Width="120"
+              IsIndeterminate="True"
+              IsVisible="{Binding IsBusy}" />
+        </Grid>
+      </Border>
+    </Grid>
+  </Border>
+</UserControl>

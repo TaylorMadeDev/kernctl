@@ -1,7 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Kernctl.App.Services;
+using Kernctl.App.ViewModels.Profiles;
 using Kernctl.Core.Models;
+using Kernctl.Core.Profiles;
 using Kernctl.Core.Services;
 
 namespace Kernctl.App.ViewModels.Pages;
@@ -21,10 +23,12 @@ public sealed partial class GamingPageViewModel : ObservableObject
 
     public GamingPageViewModel(
         IProfileService profileService,
-        ISystemMetricsService metricsService)
+        ISystemMetricsService metricsService,
+        ProfileManagerViewModel? profileManager = null)
     {
         this.profileService = profileService;
         this.metricsService = metricsService;
+        ProfileManager = profileManager;
         activeProfileName = profileService.ActiveProfile.Name;
         activeProfileDescription = profileService.ActiveProfile.Description;
 
@@ -75,11 +79,19 @@ public sealed partial class GamingPageViewModel : ObservableObject
             choice => choice.Kind == profileService.ActiveProfile.Kind);
 
         profileService.ActiveProfileChanged += OnActiveProfileChanged;
+        if (ProfileManager is not null)
+        {
+            activeProfileName = ProfileManager.ActiveProfile.Name;
+            activeProfileDescription = ProfileManager.ActiveProfile.Description;
+            ProfileManager.ActiveProfileChanged += OnManagedActiveProfileChanged;
+        }
     }
 
     public IReadOnlyList<ToolCardViewModel> Tools { get; }
 
     public IReadOnlyList<ProfileChoiceViewModel> ProfileChoices { get; }
+
+    public ProfileManagerViewModel? ProfileManager { get; }
 
     public string ActiveProfileName
     {
@@ -141,6 +153,12 @@ public sealed partial class GamingPageViewModel : ObservableObject
     [RelayCommand]
     private void OpenProfileDialog()
     {
+        if (ProfileManager is not null)
+        {
+            ProfileManager.OpenCommand.Execute(null);
+            return;
+        }
+
         SelectedProfileChoice = ProfileChoices.Single(
             choice => choice.Kind == profileService.ActiveProfile.Kind);
         IsProfileDialogOpen = true;
@@ -171,6 +189,13 @@ public sealed partial class GamingPageViewModel : ObservableObject
     };
 
     private void OnActiveProfileChanged(object? sender, ProfileDefinition profile)
+    {
+        ActiveProfileName = profile.Name;
+        ActiveProfileDescription = profile.Description;
+        PowerValue = profile.Name;
+    }
+
+    private void OnManagedActiveProfileChanged(object? sender, SystemProfile profile)
     {
         ActiveProfileName = profile.Name;
         ActiveProfileDescription = profile.Description;

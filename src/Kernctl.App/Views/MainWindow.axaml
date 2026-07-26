@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Kernctl.App.Controls"
     xmlns:services="using:Kernctl.App.Services"
+    xmlns:views="using:Kernctl.App.Views"
     xmlns:viewModels="using:Kernctl.App.ViewModels"
     Width="{DynamicResource Window.Width}"
     Height="{DynamicResource Window.Height}"
@@ -206,6 +207,17 @@
           </Grid>
         </StackPanel>
       </Border>
+    </Border>
+
+    <Border
+        Grid.ColumnSpan="2"
+        Background="{DynamicResource Brush.Overlay}"
+        IsVisible="{Binding Profiles.IsOpen}"
+        ZIndex="34">
+      <views:ProfileWorkspace
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch"
+          DataContext="{Binding Profiles}" />
     </Border>
 
     <Border

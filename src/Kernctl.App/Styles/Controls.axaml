@@ -128,6 +128,24 @@
     <Setter Property="BorderThickness" Value="2" />
   </Style>
 
+  <Style Selector="CheckBox">
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+    <Setter Property="Background" Value="{DynamicResource Brush.Surface.Secondary}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border.Strong}" />
+  </Style>
+  <Style Selector="CheckBox:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+  </Style>
+  <Style Selector="CheckBox:checked">
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+    <Setter Property="Background" Value="{DynamicResource Brush.Accent}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+  </Style>
+  <Style Selector="CheckBox:focus-visible">
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Focus}" />
+  </Style>
+
   <Style Selector="ListBox.navigation">
     <Setter Property="Background" Value="{DynamicResource Brush.Transparent}" />
     <Setter Property="BorderThickness" Value="0" />
@@ -219,6 +237,13 @@
   <Style Selector="Border.tool-card:pointerover">
     <Setter Property="Background" Value="{DynamicResource Brush.Surface.Secondary}" />
     <Setter Property="BorderBrush" Value="{DynamicResource Brush.Text.Muted}" />
+  </Style>
+  <Style Selector="Border.profile-card">
+    <Setter Property="Padding" Value="{DynamicResource Card.Padding}" />
+    <Setter Property="Background" Value="{DynamicResource Brush.Surface.Primary}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border.Subtle}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Medium}" />
   </Style>
 
   <Style Selector="ToggleSwitch.kernctl">

@@ -97,6 +97,9 @@ public sealed class AvaloniaThemeResourceSink : IThemeResourceSink
         resources["Control.Height"] = theme.Spacing.ControlHeight;
         resources["Card.Padding"] = new Thickness(theme.Spacing.CardPadding);
         resources["Dialog.Padding"] = new Thickness(theme.Spacing.CardPadding + 11);
+        resources["Inset.3"] = new Thickness(Math.Max(8, theme.Spacing.CardPadding - 5));
+        resources["Inset.5"] = new Thickness(theme.Spacing.CardPadding + 3);
+        resources["Inset.6"] = new Thickness(theme.Spacing.CardPadding + 7);
         resources["NavigationItem.Height"] = theme.Spacing.NavigationItemHeight;
         resources["Page.Spacing"] = theme.Spacing.PageSpacing;
         resources["Grid.Gap"] = theme.Spacing.GridGap;
