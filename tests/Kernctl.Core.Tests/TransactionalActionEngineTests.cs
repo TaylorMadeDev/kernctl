@@ -318,6 +318,31 @@ public sealed class TransactionalActionEngineTests
     }
 
     [Fact]
+    public async Task CommittedTransactionCanBeExplicitlyRolledBackFromArchive()
+    {
+        var action = new TestSystemAction("manual-rollback");
+        using var fixture = new ActionEngineTestFixture(action);
+        var plan = await fixture.PlanAsync(
+            TestContext.Current.CancellationToken,
+            action.Descriptor.Id);
+        var committed = await fixture.Engine.ExecuteAsync(
+            plan,
+            TestContext.Current.CancellationToken);
+
+        var rolledBack = await fixture.Engine.RollbackAsync(
+            plan.TransactionId,
+            TestContext.Current.CancellationToken);
+        var history = await fixture.Engine.ReadHistoryAsync(
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(TransactionState.Committed, committed.FinalState);
+        Assert.Equal(TransactionState.RolledBack, rolledBack.FinalState);
+        Assert.Equal(0, action.Value);
+        Assert.True(rolledBack.RollbackAttempted);
+        Assert.Equal(TransactionState.RolledBack, Assert.Single(history).FinalState);
+    }
+
+    [Fact]
     public async Task ProgressEventsFollowLifecycleOrder()
     {
         var action = new TestSystemAction("progress");
