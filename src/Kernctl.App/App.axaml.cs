@@ -47,7 +47,14 @@ public sealed partial class App : Application
     {
         services.AddSingleton<IProfileService, ProfileService>();
         services.AddSingleton<ISystemMetricsService, DevelopmentSystemMetricsService>();
-        services.AddSingleton<ITransactionalActionEngine, TransactionalActionEngine>();
+        services.AddSingleton<IActionRegistry>(_ => new ActionRegistry([]));
+        services.AddSingleton(_ => new ActionJournalOptions(Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "kernctl",
+            "transactions")));
+        services.AddSingleton<IActionJournalStore, FileActionJournalStore>();
+        services.AddSingleton<IActionHistoryService, ActionHistoryService>();
+        services.AddSingleton<IActionTransactionEngine, ActionTransactionEngine>();
         services.AddSingleton(_ => new ThemeStore(Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "kernctl")));
