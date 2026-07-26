@@ -154,6 +154,24 @@ in journal history as simulations.
 
 Tests assert that dry-run operation logs contain no capture or mutation stage.
 
+## Administrator sessions
+
+An administrator-required plan reports that requirement during review. Only
+`ExecuteAsync`, after explicit confirmation, may ask `IActionPrivilegeBroker` to open
+the short-lived elevated broker. The engine journals the safe request outcome before
+snapshot/apply. Standard-user actions and every dry run bypass the broker.
+
+Consent decline and launch, connection, handshake, identity, or version failures
+become structured `ActionError` values at the elevation stage and archive as a
+pre-mutation failure. The broker session stays alive through apply, verification, and
+automatic rollback, then is disposed. Explicit administrator rollback and crash
+recovery reacquire the same restricted privilege path.
+
+Elevation journal metadata contains only requested/granted/declined/failed state,
+timestamps, rollback purpose, and safe outcome text. It never stores pipe names,
+session identifiers, hashes, paths, command lines, or authentication material. See
+[elevated-broker.md](elevated-broker.md) for the IPC and threat model.
+
 ## Journal layout and format
 
 Production root:

@@ -3,9 +3,11 @@
 ## Projects
 
 `Kernctl.App` owns presentation and composes dependencies. `Kernctl.Core` contains
-portable state and contracts. `Kernctl.Platform.Windows` implements only harmless,
-read-only Windows services during this milestone. Tests target platform-independent
-behaviour.
+portable state and contracts. `Kernctl.Broker.Protocol` contains strict DTOs and
+framing rules, `Kernctl.Broker.Client` owns UAC launch and the unelevated pipe client,
+and the separate `Kernctl.Broker` executable owns verification and dispatch.
+`Kernctl.Platform.Windows` still implements only harmless, read-only Windows services
+during this milestone.
 
 Dependencies point inward:
 
@@ -78,8 +80,8 @@ ISystemAction registry                  IActionJournalStore
     detect / plan / validate              atomic snapshots
     capture / apply / verify               archived history
     rollback
-                    ↓ future implementation
-Kernctl.Platform.Windows → restricted broker when administrator approval is needed
+                    ↓ administrator contract
+Kernctl.Broker.Client → UAC → restricted diagnostic broker
 ```
 
 Plans use immutable collections and are checked against the registered action ID and
@@ -104,7 +106,13 @@ journals and exposes a decision through `ActionRecoveryViewModel`; it never sile
 resumes apply. Completed journals are archived and reduced to sanitized read-only
 history entries. See [action-engine.md](action-engine.md) for the complete contract.
 
-## Future safety boundary
+Administrator-required execution now uses `IActionPrivilegeBroker` after confirmation
+and before snapshot/apply. Standard-user actions and dry runs bypass it. The client
+launches a separate broker with UAC; the broker accepts one verified local pipe client
+and only four non-mutating diagnostics. See
+[elevated-broker.md](elevated-broker.md).
+
+## Elevation boundary
 
 ```text
 Avalonia UI (unelevated)
@@ -116,10 +124,10 @@ Windows platform services
 Restricted elevated broker for approved privileged operations
 ```
 
-The UI must not permanently run as administrator. A future broker will expose a
-small, versioned allow-list of operations, validate every input, authenticate the
-calling process, and return structured results. It will not accept arbitrary
-commands, registry paths, service names, or file paths.
+The UI never relaunches as administrator. The broker uses a versioned, length-framed
+JSON protocol, a secured local-only named pipe, OS-backed client process verification,
+bounded lifetimes and request counts, and exact operation registration. It does not
+accept arbitrary commands, scripts, registry paths, service names, or file paths.
 
 ## Current milestone
 
@@ -128,5 +136,6 @@ remain in-memory only. Theme preferences are the sole persisted application stat
 stay inside the current user's local application-data directory. Metrics are deliberately
 labelled sample values. The transaction engine persists only plans, mock-action
 snapshots, lifecycle state, and sanitized history; no production action is registered.
-No privileged, registry, service, power-plan, process, network, or unrelated user-file
-mutation code exists.
+The elevated broker contains only non-mutating information, capability, ping, and
+shutdown diagnostics. No registry, service, power-plan, process, network, or
+unrelated user-file mutation code exists.

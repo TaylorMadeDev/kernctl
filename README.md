@@ -5,8 +5,8 @@
 kernctl is an early-stage Windows control centre for storage, gaming, performance,
 network, application, and safe system-management workflows. This milestone provides
 the repository architecture, a polished non-destructive Avalonia UI, a complete
-runtime theme customizer under **Settings → Appearance**, and the transactional
-safety engine that all future system actions must use.
+runtime theme customizer under **Settings → Appearance**, the transactional safety
+engine, and a restricted short-lived Windows elevation broker.
 
 > [!IMPORTANT]
 > kernctl is not production-ready. All profile and tool interactions in this
@@ -45,9 +45,13 @@ dotnet run --project src/Kernctl.App/Kernctl.App.csproj
 ## Solution structure
 
 - `src/Kernctl.App` — Avalonia presentation, controls, views, and view models.
+- `src/Kernctl.Broker.Protocol` — strict versioned broker DTOs and framing limits.
+- `src/Kernctl.Broker.Client` — broker discovery, UAC launch, and typed diagnostics.
+- `src/Kernctl.Broker` — separately elevated one-session diagnostic allowlist.
 - `src/Kernctl.Core` — platform-independent contracts, models, and state logic.
 - `src/Kernctl.Platform.Windows` — harmless Windows-specific service implementations.
 - `tests/Kernctl.Core.Tests` — unit tests for core and view-model behaviour.
+- `tests/Kernctl.Broker.Tests` — protocol, allowlist, and Windows IPC security tests.
 - `docs` — architecture, safety, and design-system documentation.
 - `svgs` — supplied Font Awesome SVG source library, kept in its original categories.
 
@@ -81,6 +85,19 @@ Journals are stored without elevation under:
 
 See [Action engine and rollback safety](docs/action-engine.md) for the lifecycle,
 state machines, journal format, and future action requirements.
+
+## Restricted elevation broker
+
+The UI remains unelevated. A confirmed administrator-required transaction uses
+Windows UAC to start a separate broker for one bounded session. The broker accepts
+one locally verified client and exposes only information, capabilities, ping, and
+shutdown diagnostics in this milestone. It contains no real privileged system
+operation.
+
+Release sessions require trusted matching Authenticode signatures. Unsigned Debug
+builds use a documented same-directory development exception and must not be
+distributed. See [Restricted elevated Windows broker](docs/elevated-broker.md) for
+the protocol, identity checks, threat model, packaging, and limitations.
 
 ## Theme customization
 
@@ -117,7 +134,8 @@ or personal information.
 1. Add automated visual regression coverage for the shell and theme editor.
 2. Add read-only Windows hardware and storage inventory.
 3. Add the first read-only detections and reviewed mock-backed action workflow.
-4. Design a restricted broker for narrowly approved administrator operations.
+4. Add the first reviewed, reversible Windows operation to the existing broker
+   allowlist only after its isolated platform implementation and rollback tests exist.
 
 ## Assets and attribution
 
