@@ -1,0 +1,41 @@
+<UserControl
+    x:Class="Kernctl.App.Controls.ActionProgressPanel"
+    x:DataType="actions:ActionProgressViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:actions="using:Kernctl.App.ViewModels.Actions">
+  <Border
+      Padding="{DynamicResource Card.Padding}"
+      Background="{DynamicResource Brush.Surface.Primary}"
+      BorderBrush="{DynamicResource Brush.Border.Subtle}"
+      BorderThickness="1"
+      CornerRadius="{DynamicResource Radius.Large}">
+    <StackPanel Spacing="{DynamicResource Grid.Gap}">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="3">
+          <TextBlock Classes="heading" Text="{Binding CurrentAction}" />
+          <TextBlock Classes="caption" Text="{Binding LifecycleStage}" />
+        </StackPanel>
+        <Border
+            Grid.Column="1"
+            Classes="status warning"
+            IsVisible="{Binding IsRollback}">
+          <TextBlock Classes="label" Text="ROLLING BACK" />
+        </Border>
+      </Grid>
+      <TextBlock Classes="body" Text="{Binding Message}" TextWrapping="Wrap" />
+      <ProgressBar
+          Maximum="100"
+          Value="{Binding ProgressPercent}"
+          IsIndeterminate="{Binding IsIndeterminate}" />
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Classes="caption" Text="{Binding ProgressLabel}" />
+        <Button
+            Grid.Column="1"
+            Classes="outline"
+            Command="{Binding CancelCommand}"
+            Content="Cancel safely" />
+      </Grid>
+    </StackPanel>
+  </Border>
+</UserControl>

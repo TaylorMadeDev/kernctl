@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Kernctl.App.Services;
+using Kernctl.App.ViewModels.Actions;
 using Kernctl.App.ViewModels.Pages;
 
 namespace Kernctl.App.ViewModels;
@@ -21,11 +22,15 @@ public sealed class MainWindowViewModel : ObservableObject
     public MainWindowViewModel(
         GamingPageViewModel gaming,
         SettingsPageViewModel settings,
-        IThemeService themeService)
+        IThemeService themeService,
+        ActionRecoveryViewModel? actionRecovery = null,
+        ActionProgressViewModel? actionProgress = null)
     {
         Gaming = gaming;
         Settings = settings;
         ThemeService = themeService;
+        ActionRecovery = actionRecovery;
+        ActionProgress = actionProgress;
         DiscardThemeChangesCommand = new RelayCommand(DiscardThemeChanges);
         KeepEditingThemeCommand = new RelayCommand(KeepEditingTheme);
 
@@ -91,6 +96,10 @@ public sealed class MainWindowViewModel : ObservableObject
     public SettingsPageViewModel Settings { get; }
 
     public IThemeService ThemeService { get; }
+
+    public ActionRecoveryViewModel? ActionRecovery { get; }
+
+    public ActionProgressViewModel? ActionProgress { get; }
 
     public ObservableCollection<SearchResultViewModel> SearchResults { get; } = [];
 
@@ -162,8 +171,14 @@ public sealed class MainWindowViewModel : ObservableObject
         private set => SetProperty(ref isUnsavedNavigationDialogOpen, value);
     }
 
-    public async Task InitializeAsync(CancellationToken cancellationToken) =>
+    public async Task InitializeAsync(CancellationToken cancellationToken)
+    {
         await Gaming.InitializeAsync(cancellationToken);
+        if (ActionRecovery is not null)
+        {
+            await ActionRecovery.InitializeAsync(cancellationToken);
+        }
+    }
 
     public void BeginSearch()
     {

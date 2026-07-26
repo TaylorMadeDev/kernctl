@@ -1,0 +1,72 @@
+<UserControl
+    x:Class="Kernctl.App.Controls.ActionRecoveryDialog"
+    x:DataType="actions:ActionRecoveryViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:actions="using:Kernctl.App.ViewModels.Actions">
+  <Border Classes="dialog" Width="680">
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="{DynamicResource Grid.Gap}">
+      <StackPanel Spacing="5">
+        <TextBlock Classes="heading" Text="Interrupted transaction found" />
+        <TextBlock
+            Classes="body"
+            Text="kernctl will never silently continue an interrupted change. Review the journal and choose whether to recover." />
+      </StackPanel>
+
+      <ListBox
+          Grid.Row="1"
+          MaxHeight="430"
+          Background="{DynamicResource Brush.Transparent}"
+          BorderThickness="0"
+          ItemsSource="{Binding Recoveries}"
+          SelectedItem="{Binding SelectedRecovery, Mode=TwoWay}">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="actions:RecoveryItemViewModel">
+            <Border
+                Margin="0,0,0,10"
+                Padding="{DynamicResource Card.Padding}"
+                Background="{DynamicResource Brush.Surface.Secondary}"
+                BorderBrush="{DynamicResource Brush.Border.Subtle}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource Radius.Medium}">
+              <StackPanel Spacing="7">
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel Spacing="2">
+                    <TextBlock Classes="heading" Text="{Binding Title}" />
+                    <TextBlock Classes="caption" Text="{Binding State}" />
+                  </StackPanel>
+                  <Border
+                      Grid.Column="1"
+                      Classes="status danger"
+                      IsVisible="{Binding ManualInterventionMayBeRequired}">
+                    <TextBlock Classes="label" Text="MANUAL REVIEW" />
+                  </Border>
+                </Grid>
+                <TextBlock Classes="body" Text="{Binding Explanation}" TextWrapping="Wrap" />
+                <TextBlock Classes="caption" Text="{Binding Actions}" TextWrapping="Wrap" />
+                <TextBlock Classes="caption" Text="{Binding AppliedSummary}" />
+                <TextBlock Classes="caption" Text="{Binding PrivilegeSummary}" />
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+        <TextBlock
+            VerticalAlignment="Center"
+            Classes="caption"
+            Text="{Binding StatusMessage}" />
+        <Button
+            Grid.Column="1"
+            Classes="outline"
+            Command="{Binding DismissCommand}"
+            Content="Decide later" />
+        <Button
+            Grid.Column="2"
+            Command="{Binding RecoverCommand}"
+            Content="Start rollback" />
+      </Grid>
+    </Grid>
+  </Border>
+</UserControl>

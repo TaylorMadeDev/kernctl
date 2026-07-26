@@ -247,5 +247,27 @@
         ZIndex="40">
       <TextBlock Text="Notification foundation" />
     </Border>
+
+    <Border
+        Grid.Column="1"
+        Width="420"
+        Margin="0,0,20,20"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Bottom"
+        IsVisible="{Binding ActionProgress.IsActive}"
+        ZIndex="44">
+      <controls:ActionProgressPanel DataContext="{Binding ActionProgress}" />
+    </Border>
+
+    <Border
+        Grid.ColumnSpan="2"
+        Background="{DynamicResource Brush.Overlay}"
+        IsVisible="{Binding ActionRecovery.IsOpen}"
+        ZIndex="45">
+      <controls:ActionRecoveryDialog
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+          DataContext="{Binding ActionRecovery}" />
+    </Border>
   </Grid>
 </Window>

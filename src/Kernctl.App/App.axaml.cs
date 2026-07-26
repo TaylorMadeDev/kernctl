@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Kernctl.App.Services;
 using Kernctl.App.ViewModels;
+using Kernctl.App.ViewModels.Actions;
 using Kernctl.App.ViewModels.Pages;
 using Kernctl.App.Views;
 using Kernctl.Core.Actions;
@@ -55,6 +56,9 @@ public sealed partial class App : Application
         services.AddSingleton<IActionJournalStore, FileActionJournalStore>();
         services.AddSingleton<IActionHistoryService, ActionHistoryService>();
         services.AddSingleton<IActionTransactionEngine, ActionTransactionEngine>();
+        services.AddSingleton<ActionReviewDialogViewModel>();
+        services.AddSingleton<ActionProgressViewModel>();
+        services.AddSingleton<ActionRecoveryViewModel>();
         services.AddSingleton(_ => new ThemeStore(Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "kernctl")));

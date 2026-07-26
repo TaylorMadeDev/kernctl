@@ -1,0 +1,99 @@
+<UserControl
+    x:Class="Kernctl.App.Controls.ActionReviewDialog"
+    x:DataType="actions:ActionReviewDialogViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:actions="using:Kernctl.App.ViewModels.Actions">
+  <Border Classes="dialog" Width="680">
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="{DynamicResource Grid.Gap}">
+      <StackPanel Spacing="5">
+        <TextBlock Classes="heading" Text="Review system actions" />
+        <TextBlock
+            Classes="body"
+            Text="Review every proposed operation before kernctl captures state or changes anything." />
+        <Border
+            HorizontalAlignment="Left"
+            Classes="status danger"
+            IsVisible="{Binding HasHighRiskActions}">
+          <TextBlock Classes="label" Text="HIGH RISK ACTION INCLUDED" />
+        </Border>
+      </StackPanel>
+
+      <ScrollViewer Grid.Row="1" MaxHeight="440">
+        <ItemsControl ItemsSource="{Binding Actions}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="actions:ActionReviewItemViewModel">
+              <Border
+                  Margin="0,0,0,10"
+                  Padding="{DynamicResource Card.Padding}"
+                  Background="{DynamicResource Brush.Surface.Secondary}"
+                  BorderBrush="{DynamicResource Brush.Border.Subtle}"
+                  BorderThickness="1"
+                  CornerRadius="{DynamicResource Radius.Medium}">
+                <StackPanel Spacing="8">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="heading" Text="{Binding Name}" />
+                      <TextBlock Classes="body" Text="{Binding Description}" />
+                    </StackPanel>
+                    <Border
+                        Grid.Column="1"
+                        Classes="status danger"
+                        IsVisible="{Binding IsHighRisk}">
+                      <TextBlock Classes="label" Text="HIGH RISK" />
+                    </Border>
+                  </Grid>
+                  <TextBlock Classes="body" Text="{Binding Explanation}" TextWrapping="Wrap" />
+                  <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="section-title" Text="Risk" />
+                      <TextBlock Classes="caption" Text="{Binding Risk}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Spacing="2">
+                      <TextBlock Classes="section-title" Text="Privilege" />
+                      <TextBlock Classes="caption" Text="{Binding Privilege}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Spacing="2">
+                      <TextBlock Classes="section-title" Text="Restart" />
+                      <TextBlock Classes="caption" Text="{Binding Restart}" />
+                    </StackPanel>
+                  </Grid>
+                  <TextBlock Classes="caption" Text="{Binding Rollback}" />
+                  <TextBlock Classes="caption" Text="{Binding AffectedResourcesText}" TextWrapping="Wrap" />
+                  <Border
+                      Padding="10,8"
+                      Background="{DynamicResource Brush.Warning.Subtle}"
+                      BorderBrush="{DynamicResource Brush.Warning}"
+                      BorderThickness="1"
+                      CornerRadius="{DynamicResource Radius.Small}"
+                      IsVisible="{Binding HasWarnings}">
+                    <StackPanel Spacing="3">
+                      <TextBlock Classes="label" Text="Warnings" />
+                      <TextBlock Classes="body" Text="{Binding WarningsText}" TextWrapping="Wrap" />
+                    </StackPanel>
+                  </Border>
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+
+      <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+        <CheckBox
+            VerticalAlignment="Center"
+            Content="Run as a dry run (no state capture or apply)"
+            IsChecked="{Binding RunAsDryRun, Mode=TwoWay}" />
+        <Button
+            Grid.Column="1"
+            Classes="outline"
+            Command="{Binding CancelCommand}"
+            Content="Cancel" />
+        <Button
+            Grid.Column="2"
+            Command="{Binding ConfirmCommand}"
+            Content="Confirm actions" />
+      </Grid>
+    </Grid>
+  </Border>
+</UserControl>

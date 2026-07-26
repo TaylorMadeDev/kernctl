@@ -18,6 +18,7 @@ internal sealed class TestSystemAction : ISystemAction
         bool failVerification = false,
         bool failRollback = false,
         bool supportsRollback = true,
+        ActionRiskLevel risk = ActionRiskLevel.Low,
         ActionPrivilegeLevel privilege = ActionPrivilegeLevel.StandardUser,
         ActionRestartRequirement restart = ActionRestartRequirement.None,
         TaskCompletionSource? applyEntered = null,
@@ -32,7 +33,7 @@ internal sealed class TestSystemAction : ISystemAction
         PartiallyMutateOnApplyFailure = partiallyMutateOnApplyFailure;
         FailVerification = failVerification;
         FailRollback = failRollback;
-        Descriptor = CreateDescriptor(id, supportsRollback, privilege, restart);
+        Descriptor = CreateDescriptor(id, supportsRollback, risk, privilege, restart);
     }
 
     public ActionDescriptor Descriptor { get; }
@@ -178,6 +179,7 @@ internal sealed class TestSystemAction : ISystemAction
     public static ActionDescriptor CreateDescriptor(
         string id,
         bool supportsRollback = true,
+        ActionRiskLevel risk = ActionRiskLevel.Low,
         ActionPrivilegeLevel privilege = ActionPrivilegeLevel.StandardUser,
         ActionRestartRequirement restart = ActionRestartRequirement.None) =>
         new(
@@ -187,7 +189,7 @@ internal sealed class TestSystemAction : ISystemAction
             "A deterministic test action.",
             "This action changes only in-memory state owned by the test process.",
             SystemActionCategory.Other,
-            ActionRiskLevel.Low,
+            risk,
             privilege,
             restart,
             [ActionPlatform.Windows],
