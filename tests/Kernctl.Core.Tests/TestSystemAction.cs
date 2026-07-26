@@ -230,11 +230,23 @@ internal sealed class ActionEngineTestFixture : IDisposable
         $"kernctl-action-engine-tests-{Guid.NewGuid():N}");
 
     public ActionEngineTestFixture(params ISystemAction[] actions)
+        : this(new UnavailableActionPrivilegeBroker(), actions)
+    {
+    }
+
+    public ActionEngineTestFixture(
+        IActionPrivilegeBroker privilegeBroker,
+        params ISystemAction[] actions)
     {
         Store = new FileActionJournalStore(new(root, HistoryRetention: 10));
         Registry = new ActionRegistry(actions);
         History = new ActionHistoryService(Store);
-        Engine = new ActionTransactionEngine(Registry, Store, History);
+        Engine = new ActionTransactionEngine(
+            Registry,
+            Store,
+            History,
+            logger: null,
+            privilegeBroker: privilegeBroker);
     }
 
     public string Root => root;
@@ -260,6 +272,54 @@ internal sealed class ActionEngineTestFixture : IDisposable
         if (Directory.Exists(root))
         {
             Directory.Delete(root, recursive: true);
+        }
+    }
+}
+
+internal sealed class FakeActionPrivilegeBroker(
+    ActionPrivilegeOpenStatus status = ActionPrivilegeOpenStatus.Ready)
+    : IActionPrivilegeBroker
+{
+    public ActionPrivilegeOpenStatus Status { get; set; } = status;
+
+    public int OpenCount { get; private set; }
+
+    public bool SessionDisposed { get; private set; }
+
+    public List<ActionPrivilegeSessionRequest> Requests { get; } = [];
+
+    public Task<ActionPrivilegeOpenResult> OpenAsync(
+        ActionPrivilegeSessionRequest request,
+        IProgress<ActionPrivilegeBrokerProgress>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        OpenCount++;
+        Requests.Add(request);
+        progress?.Report(new(
+            ActionPrivilegeBrokerState.AwaitingConsent,
+            "Awaiting Windows administrator consent."));
+        return Task.FromResult(Status switch
+        {
+            ActionPrivilegeOpenStatus.Ready =>
+                ActionPrivilegeOpenResult.Ready(new Session(this)),
+            ActionPrivilegeOpenStatus.Cancelled =>
+                ActionPrivilegeOpenResult.Cancelled(new(
+                    "ELEVATION_CANCELLED",
+                    "Administrator permission was declined. No changes were made.",
+                    RetryPossible: true)),
+            _ => ActionPrivilegeOpenResult.Failed(new(
+                "ELEVATION_FAILED",
+                "Administrator permission could not be prepared.",
+                RetryPossible: true)),
+        });
+    }
+
+    private sealed class Session(FakeActionPrivilegeBroker owner) : IActionPrivilegeSession
+    {
+        public ValueTask DisposeAsync()
+        {
+            owner.SessionDisposed = true;
+            return ValueTask.CompletedTask;
         }
     }
 }

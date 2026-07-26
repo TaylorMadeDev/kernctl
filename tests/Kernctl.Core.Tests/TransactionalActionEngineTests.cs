@@ -368,11 +368,12 @@ public sealed class TransactionalActionEngineTests
     [Fact]
     public async Task PrivilegeAndRestartMetadataFlowIntoPlanAndResult()
     {
+        var privilegeBroker = new FakeActionPrivilegeBroker();
         var action = new TestSystemAction(
             "admin-restart",
             privilege: ActionPrivilegeLevel.Administrator,
             restart: ActionRestartRequirement.SystemRestart);
-        using var fixture = new ActionEngineTestFixture(action);
+        using var fixture = new ActionEngineTestFixture(privilegeBroker, action);
 
         var plan = await fixture.PlanAsync(
             TestContext.Current.CancellationToken,
@@ -386,6 +387,113 @@ public sealed class TransactionalActionEngineTests
             Assert.Single(plan.Actions).Plan.RequiredPrivilege);
         Assert.Equal(ActionRestartRequirement.SystemRestart, plan.RestartRequirement);
         Assert.Equal(ActionRestartRequirement.SystemRestart, result.RestartRequirement);
+        Assert.True(result.Succeeded);
+        Assert.Equal(1, privilegeBroker.OpenCount);
+        Assert.True(privilegeBroker.SessionDisposed);
+    }
+
+    [Fact]
+    public async Task StandardUserAndDryRunPlansNeverOpenPrivilegeBroker()
+    {
+        var privilegeBroker = new FakeActionPrivilegeBroker();
+        var standard = new TestSystemAction("standard");
+        var administrator = new TestSystemAction(
+            "admin-dry-run",
+            privilege: ActionPrivilegeLevel.Administrator);
+        using var fixture = new ActionEngineTestFixture(
+            privilegeBroker,
+            standard,
+            administrator);
+
+        var standardPlan = await fixture.PlanAsync(
+            TestContext.Current.CancellationToken,
+            standard.Descriptor.Id);
+        var standardResult = await fixture.Engine.ExecuteAsync(
+            standardPlan,
+            TestContext.Current.CancellationToken);
+        var dryRunResult = await fixture.Engine.DryRunAsync(
+            new ActionTransactionRequest([administrator.Descriptor.Id]),
+            TestContext.Current.CancellationToken);
+
+        Assert.True(standardResult.Succeeded);
+        Assert.True(dryRunResult.Succeeded);
+        Assert.Equal(0, privilegeBroker.OpenCount);
+    }
+
+    [Fact]
+    public async Task DeclinedAdministratorConsentStopsBeforeSnapshotAndIsJournaled()
+    {
+        var privilegeBroker = new FakeActionPrivilegeBroker(
+            ActionPrivilegeOpenStatus.Cancelled);
+        var action = new TestSystemAction(
+            "admin-declined",
+            privilege: ActionPrivilegeLevel.Administrator);
+        using var fixture = new ActionEngineTestFixture(privilegeBroker, action);
+        var stages = new List<ActionExecutionStage>();
+        fixture.Engine.ProgressChanged += (_, update) => stages.Add(update.Stage);
+        var plan = await fixture.PlanAsync(
+            TestContext.Current.CancellationToken,
+            action.Descriptor.Id);
+        Assert.Equal(0, privilegeBroker.OpenCount);
+
+        var result = await fixture.Engine.ExecuteAsync(
+            plan,
+            TestContext.Current.CancellationToken);
+        var journal = await fixture.Store.LoadAsync(
+            plan.TransactionId,
+            TestContext.Current.CancellationToken);
+
+        Assert.False(result.Succeeded);
+        Assert.Equal(TransactionState.Failed, result.FinalState);
+        Assert.Contains(result.Errors, error => error.Code == "ELEVATION_CANCELLED");
+        Assert.Contains(ActionExecutionStage.Elevation, stages);
+        Assert.DoesNotContain("capture:admin-declined", action.Operations);
+        Assert.DoesNotContain("apply:admin-declined", action.Operations);
+        Assert.Equal(TransactionElevationState.Declined, journal.Elevation?.State);
+        Assert.DoesNotContain(
+            "pipe",
+            journal.Elevation?.SafeOutcome ?? string.Empty,
+            StringComparison.OrdinalIgnoreCase);
+        var archivedPath = Assert.Single(Directory.EnumerateFiles(
+            Path.Combine(fixture.Root, "archive"),
+            "*.json"));
+        var archivedJson = await File.ReadAllTextAsync(
+            archivedPath,
+            TestContext.Current.CancellationToken);
+        Assert.DoesNotContain("pipeName", archivedJson, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("clientSha256", archivedJson, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("sessionId", archivedJson, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task AdministratorRollbackUsesASecondRestrictedPrivilegeSession()
+    {
+        var privilegeBroker = new FakeActionPrivilegeBroker();
+        var action = new TestSystemAction(
+            "admin-rollback",
+            privilege: ActionPrivilegeLevel.Administrator);
+        using var fixture = new ActionEngineTestFixture(privilegeBroker, action);
+        var plan = await fixture.PlanAsync(
+            TestContext.Current.CancellationToken,
+            action.Descriptor.Id);
+        var committed = await fixture.Engine.ExecuteAsync(
+            plan,
+            TestContext.Current.CancellationToken);
+
+        var rolledBack = await fixture.Engine.RollbackAsync(
+            plan.TransactionId,
+            TestContext.Current.CancellationToken);
+        var journal = await fixture.Store.LoadAsync(
+            plan.TransactionId,
+            TestContext.Current.CancellationToken);
+
+        Assert.True(committed.Succeeded);
+        Assert.Equal(TransactionState.RolledBack, rolledBack.FinalState);
+        Assert.Equal(2, privilegeBroker.OpenCount);
+        Assert.False(privilegeBroker.Requests[0].IsRollback);
+        Assert.True(privilegeBroker.Requests[1].IsRollback);
+        Assert.Equal(TransactionElevationState.Granted, journal.Elevation?.State);
+        Assert.True(journal.Elevation?.IsRollback);
     }
 
     private static void AssertOrdered(

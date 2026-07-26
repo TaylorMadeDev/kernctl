@@ -1,4 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Unelevated client and UAC launcher for the restricted kernctl broker.</Description>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Kernctl.Broker.Protocol\Kernctl.Broker.Protocol.csproj" />
     <ProjectReference Include="..\Kernctl.Core\Kernctl.Core.csproj" />

@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Versioned, bounded contracts for the kernctl elevated broker.</Description>
+  </PropertyGroup>
+</Project>

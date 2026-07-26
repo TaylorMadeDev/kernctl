@@ -16,6 +16,7 @@ public sealed class ActionProgressViewModel : ObservableObject, IDisposable
     private int totalActions;
     private bool isRollback;
     private bool isCancellationRequested;
+    private bool isAdministratorRequest;
     private bool isActive;
     private bool disposed;
 
@@ -97,6 +98,12 @@ public sealed class ActionProgressViewModel : ObservableObject, IDisposable
         }
     }
 
+    public bool IsAdministratorRequest
+    {
+        get => isAdministratorRequest;
+        private set => SetProperty(ref isAdministratorRequest, value);
+    }
+
     public bool IsActive
     {
         get => isActive;
@@ -125,6 +132,7 @@ public sealed class ActionProgressViewModel : ObservableObject, IDisposable
         TotalActions = actionCount;
         CompletedActions = 0;
         IsRollback = false;
+        IsAdministratorRequest = false;
         IsCancellationRequested = false;
         IsActive = true;
     }
@@ -167,6 +175,7 @@ public sealed class ActionProgressViewModel : ObservableObject, IDisposable
             TransactionId = update.TransactionId;
             CurrentAction = update.ActionName ?? "Transaction";
             LifecycleStage = update.Stage.ToString();
+            IsAdministratorRequest = update.Stage == ActionExecutionStage.Elevation;
             Message = update.Message;
             CompletedActions = update.CompletedActions;
             TotalActions = update.TotalActions;

@@ -17,6 +17,22 @@
             IsVisible="{Binding HasHighRiskActions}">
           <TextBlock Classes="label" Text="HIGH RISK ACTION INCLUDED" />
         </Border>
+        <Border
+            Margin="0,6,0,0"
+            Padding="12,10"
+            Background="{DynamicResource Brush.Warning.Subtle}"
+            BorderBrush="{DynamicResource Brush.Warning}"
+            BorderThickness="1"
+            CornerRadius="{DynamicResource Radius.Small}"
+            IsVisible="{Binding RequiresAdministrator}">
+          <StackPanel Spacing="3">
+            <TextBlock Classes="label" Text="Administrator permission required" />
+            <TextBlock
+                Classes="body"
+                Text="Windows will ask for consent after you confirm. kernctl stays unelevated and opens a short-lived restricted broker only for this transaction."
+                TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
       </StackPanel>
 
       <ScrollViewer Grid.Row="1" MaxHeight="440">

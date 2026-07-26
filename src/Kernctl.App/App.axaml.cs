@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Kernctl.Broker.Client;
 using Kernctl.App.Services;
 using Kernctl.App.ViewModels;
 using Kernctl.App.ViewModels.Actions;
@@ -48,6 +49,12 @@ public sealed partial class App : Application
     {
         services.AddSingleton<IProfileService, ProfileService>();
         services.AddSingleton<ISystemMetricsService, DevelopmentSystemMetricsService>();
+        services.AddSingleton(BrokerClientOptions.Default);
+        services.AddSingleton<IBrokerExecutableResolver, BrokerExecutableResolver>();
+        services.AddSingleton<ICurrentProcessIdentityProvider, CurrentProcessIdentityProvider>();
+        services.AddSingleton<IUacBrokerLauncher, WindowsUacBrokerLauncher>();
+        services.AddSingleton<IBrokerClient, BrokerClient>();
+        services.AddSingleton<IActionPrivilegeBroker, ActionPrivilegeBroker>();
         services.AddSingleton<IActionRegistry>(_ => new ActionRegistry([]));
         services.AddSingleton(_ => new ActionJournalOptions(Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),

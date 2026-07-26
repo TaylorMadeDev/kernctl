@@ -13,7 +13,8 @@ public sealed record TransactionJournal(
     ActionRestartRequirement RestartRequirement,
     bool RollbackAttempted,
     ImmutableArray<JournalActionEntry> Actions,
-    ImmutableArray<ActionError> Errors)
+    ImmutableArray<ActionError> Errors,
+    TransactionElevationRecord? Elevation = null)
 {
     public const int CurrentSchemaVersion = 1;
 
@@ -44,8 +45,25 @@ public sealed record TransactionJournal(
                     false,
                     null)),
             ],
-            []);
+            [],
+            null);
 }
+
+public enum TransactionElevationState
+{
+    Requested,
+    Granted,
+    Declined,
+    Failed,
+    Closed,
+}
+
+public sealed record TransactionElevationRecord(
+    TransactionElevationState State,
+    DateTimeOffset RequestedAtUtc,
+    DateTimeOffset? CompletedAtUtc,
+    bool IsRollback,
+    string SafeOutcome);
 
 public sealed record JournalActionEntry(
     int Order,

@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Kernctl.Broker.Client\Kernctl.Broker.Client.csproj" />
+    <ProjectReference
+        Include="..\Kernctl.Broker\Kernctl.Broker.csproj"
+        ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\Kernctl.Core\Kernctl.Core.csproj" />
     <ProjectReference Include="..\Kernctl.Platform.Windows\Kernctl.Platform.Windows.csproj" />
   </ItemGroup>
@@ -45,4 +49,26 @@
     <AvaloniaResource Include="..\..\svgs\solid\crosshairs.svg" Link="Assets\Icons\solid\crosshairs.svg" />
     <AvaloniaResource Include="..\..\svgs\solid\leaf.svg" Link="Assets\Icons\solid\leaf.svg" />
   </ItemGroup>
+
+  <Target Name="CopyBrokerToApplicationOutput" AfterTargets="Build">
+    <ItemGroup>
+      <BrokerBuildArtifact
+          Include="..\Kernctl.Broker\bin\$(Configuration)\$(TargetFramework)\Kernctl.Broker.*"
+          Exclude="..\Kernctl.Broker\bin\$(Configuration)\$(TargetFramework)\Kernctl.Broker.pdb" />
+    </ItemGroup>
+    <Copy
+        SourceFiles="@(BrokerBuildArtifact)"
+        DestinationFolder="$(OutDir)"
+        SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="PublishBrokerWithApplication" BeforeTargets="Publish">
+    <PropertyGroup>
+      <BrokerPublishDirectory>$([System.IO.Path]::GetFullPath('$(PublishDir)'))</BrokerPublishDirectory>
+    </PropertyGroup>
+    <MSBuild
+        Projects="..\Kernctl.Broker\Kernctl.Broker.csproj"
+        Targets="Publish"
+        Properties="Configuration=$(Configuration);TargetFramework=$(TargetFramework);PublishDir=$(BrokerPublishDirectory)" />
+  </Target>
 </Project>

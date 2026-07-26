@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <Description>Short-lived allowlisted elevated broker for kernctl.</Description>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kernctl.Broker.Protocol\Kernctl.Broker.Protocol.csproj" />
+    <ProjectReference Include="..\Kernctl.Platform.Windows\Kernctl.Platform.Windows.csproj" />
+  </ItemGroup>
+</Project>

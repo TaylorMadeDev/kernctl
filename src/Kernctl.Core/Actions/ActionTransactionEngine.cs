@@ -10,7 +10,8 @@ public sealed class ActionTransactionEngine(
     IActionRegistry registry,
     IActionJournalStore journalStore,
     IActionHistoryService historyService,
-    ILogger<ActionTransactionEngine>? logger = null) : IActionTransactionEngine, IDisposable
+    ILogger<ActionTransactionEngine>? logger = null,
+    IActionPrivilegeBroker? privilegeBroker = null) : IActionTransactionEngine, IDisposable
 {
     private static readonly Action<ILogger, Guid, string, Exception?> LogPlanningFailure =
         LoggerMessage.Define<Guid, string>(
@@ -37,6 +38,11 @@ public sealed class ActionTransactionEngine(
             LogLevel.Error,
             new EventId(1005, nameof(LogRollbackFailure)),
             "Rollback failed unexpectedly for transaction {TransactionId} action {ActionId}.");
+    private static readonly Action<ILogger, Guid, Exception?> LogElevationFailure =
+        LoggerMessage.Define<Guid>(
+            LogLevel.Warning,
+            new EventId(1006, nameof(LogElevationFailure)),
+            "Administrator broker preparation failed for transaction {TransactionId}.");
 
     private readonly ConcurrentDictionary<Guid, CancellationTokenSource> activeCancellations = new();
     private readonly IActionHistoryService historyService = historyService;
@@ -44,6 +50,8 @@ public sealed class ActionTransactionEngine(
     private readonly ILogger<ActionTransactionEngine> logger =
         logger ?? NullLogger<ActionTransactionEngine>.Instance;
     private readonly IActionRegistry registry = registry;
+    private readonly IActionPrivilegeBroker privilegeBroker =
+        privilegeBroker ?? new UnavailableActionPrivilegeBroker();
     private readonly SemaphoreSlim mutationLock = new(1, 1);
     private bool disposed;
 
@@ -285,6 +293,7 @@ public sealed class ActionTransactionEngine(
             return BusyResult(plan);
         }
 
+        IActionPrivilegeSession? privilegeSession = null;
         try
         {
             var journal = await journalStore.LoadAsync(plan.TransactionId, cancellationToken);
@@ -336,6 +345,26 @@ public sealed class ActionTransactionEngine(
                     await journalStore.ArchiveAsync(journal, CancellationToken.None);
                     return Result(journal, false, error.UserMessage);
                 }
+            }
+
+            if (RequiresAdministrator(plan))
+            {
+                var privilege = await OpenPrivilegeSessionAsync(
+                    journal,
+                    plan.Actions.Select(action => action.Descriptor.Id).ToImmutableArray(),
+                    isRollback: false,
+                    transactionCancellation.Token);
+                journal = privilege.Journal;
+                if (privilege.Result.Status != ActionPrivilegeOpenStatus.Ready
+                    || privilege.Result.Session is null)
+                {
+                    return await CompletePrivilegeFailureAsync(
+                        journal,
+                        privilege.Result,
+                        isRollback: false);
+                }
+
+                privilegeSession = privilege.Result.Session;
             }
 
             journal = await TransitionTransactionAsync(
@@ -624,6 +653,18 @@ public sealed class ActionTransactionEngine(
         }
         finally
         {
+            if (privilegeSession is not null)
+            {
+                try
+                {
+                    await privilegeSession.DisposeAsync();
+                }
+                catch (Exception exception)
+                {
+                    LogElevationFailure(logger, plan.TransactionId, exception);
+                }
+            }
+
             activeCancellations.TryRemove(plan.TransactionId, out _);
             mutationLock.Release();
         }
@@ -649,7 +690,10 @@ public sealed class ActionTransactionEngine(
         try
         {
             var journal = await journalStore.LoadAsync(transactionId, cancellationToken);
-            return await PerformRollbackAsync(journal, "Rollback requested.");
+            return await PerformRollbackWithPrivilegeAsync(
+                journal,
+                "Rollback requested.",
+                cancellationToken);
         }
         finally
         {
@@ -731,7 +775,10 @@ public sealed class ActionTransactionEngine(
                     CancellationToken.None);
             }
 
-            return await PerformRollbackAsync(journal, "Interrupted transaction recovery started.");
+            return await PerformRollbackWithPrivilegeAsync(
+                journal,
+                "Interrupted transaction recovery started.",
+                cancellationToken);
         }
         finally
         {
@@ -907,6 +954,70 @@ public sealed class ActionTransactionEngine(
                 : summary);
     }
 
+    private async Task<TransactionExecutionResult> PerformRollbackWithPrivilegeAsync(
+        TransactionJournal journal,
+        string summary,
+        CancellationToken cancellationToken)
+    {
+        var administratorActionIds = journal.Actions
+            .Where(action =>
+                action.Plan?.RequiredPrivilege == ActionPrivilegeLevel.Administrator
+                && (action.MayHaveMutated
+                    || action.State is ActionExecutionState.Applying
+                        or ActionExecutionState.Applied
+                        or ActionExecutionState.Verified
+                        or ActionExecutionState.RollingBack
+                        or ActionExecutionState.RollbackFailed))
+            .Select(action => action.ActionId)
+            .ToImmutableArray();
+        if (administratorActionIds.IsEmpty)
+        {
+            return await PerformRollbackAsync(journal, summary);
+        }
+
+        var privilege = await OpenPrivilegeSessionAsync(
+            journal,
+            administratorActionIds,
+            isRollback: true,
+            cancellationToken);
+        journal = privilege.Journal;
+        if (privilege.Result.Status != ActionPrivilegeOpenStatus.Ready
+            || privilege.Result.Session is null)
+        {
+            var brokerError = privilege.Result.Error
+                ?? new ActionPrivilegeBrokerError(
+                    "ELEVATION_BROKER_FAILED",
+                    "Administrator permission could not be prepared safely.",
+                    RetryPossible: true);
+            var error = new ActionError(
+                brokerError.Code,
+                brokerError.SafeMessage,
+                "Rollback did not start because no verified administrator session was established.",
+                null,
+                journal.TransactionId,
+                ActionExecutionStage.Rollback,
+                brokerError.RetryPossible,
+                true);
+            journal = journal with
+            {
+                UpdatedAtUtc = DateTimeOffset.UtcNow,
+                Errors = journal.Errors.Add(error),
+            };
+            await journalStore.SaveAsync(journal, CancellationToken.None);
+            if (ActionStateMachine.IsTerminal(journal.State))
+            {
+                await journalStore.ArchiveAsync(journal, CancellationToken.None);
+            }
+
+            return Result(journal, false, error.UserMessage);
+        }
+
+        await using (privilege.Result.Session)
+        {
+            return await PerformRollbackAsync(journal, summary);
+        }
+    }
+
     private async Task<TransactionJournal> EnsureRollbackFailureAsync(
         TransactionJournal journal,
         int actionIndex,
@@ -931,6 +1042,120 @@ public sealed class ActionTransactionEngine(
         journal = journal with { Errors = journal.Errors.Add(error) };
         await journalStore.SaveAsync(journal, CancellationToken.None);
         return journal;
+    }
+
+    private async Task<PrivilegeOpenAttempt> OpenPrivilegeSessionAsync(
+        TransactionJournal journal,
+        ImmutableArray<string> actionIds,
+        bool isRollback,
+        CancellationToken cancellationToken)
+    {
+        var requestedAtUtc = DateTimeOffset.UtcNow;
+        journal = journal with
+        {
+            UpdatedAtUtc = requestedAtUtc,
+            Elevation = new(
+                TransactionElevationState.Requested,
+                requestedAtUtc,
+                null,
+                isRollback,
+                "Administrator permission was requested."),
+        };
+        await journalStore.SaveAsync(journal, CancellationToken.None);
+        Report(
+            journal.TransactionId,
+            null,
+            ActionExecutionStage.Elevation,
+            "Preparing administrator request.",
+            0,
+            journal.Actions.Length,
+            isRollback: isRollback);
+
+        var progress = new SynchronousProgress<ActionPrivilegeBrokerProgress>(update =>
+            Report(
+                journal.TransactionId,
+                null,
+                ActionExecutionStage.Elevation,
+                update.SafeMessage,
+                0,
+                journal.Actions.Length,
+                isRollback: isRollback));
+        ActionPrivilegeOpenResult result;
+        try
+        {
+            result = await privilegeBroker.OpenAsync(
+                new(journal.TransactionId, actionIds, isRollback),
+                progress,
+                cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            result = ActionPrivilegeOpenResult.Cancelled(
+                new(
+                    "ELEVATION_CANCELLED",
+                    "The administrator request was cancelled. No changes were made.",
+                    RetryPossible: true));
+        }
+        catch (Exception exception)
+        {
+            LogElevationFailure(logger, journal.TransactionId, exception);
+            result = ActionPrivilegeOpenResult.Failed(
+                new(
+                    "ELEVATION_BROKER_FAILED",
+                    "Administrator permission could not be prepared safely.",
+                    RetryPossible: true));
+        }
+
+        var elevationState = result.Status switch
+        {
+            ActionPrivilegeOpenStatus.Ready => TransactionElevationState.Granted,
+            ActionPrivilegeOpenStatus.Cancelled => TransactionElevationState.Declined,
+            _ => TransactionElevationState.Failed,
+        };
+        var safeOutcome = result.Status == ActionPrivilegeOpenStatus.Ready
+            ? "Administrator permission was granted."
+            : result.Error?.SafeMessage ?? "Administrator permission was unavailable.";
+        journal = journal with
+        {
+            UpdatedAtUtc = DateTimeOffset.UtcNow,
+            Elevation = journal.Elevation! with
+            {
+                State = elevationState,
+                CompletedAtUtc = DateTimeOffset.UtcNow,
+                SafeOutcome = safeOutcome,
+            },
+        };
+        await journalStore.SaveAsync(journal, CancellationToken.None);
+        return new(journal, result);
+    }
+
+    private async Task<TransactionExecutionResult> CompletePrivilegeFailureAsync(
+        TransactionJournal journal,
+        ActionPrivilegeOpenResult privilege,
+        bool isRollback)
+    {
+        var brokerError = privilege.Error
+            ?? new ActionPrivilegeBrokerError(
+                "ELEVATION_BROKER_FAILED",
+                "Administrator permission could not be prepared safely.",
+                RetryPossible: true);
+        var error = new ActionError(
+            brokerError.Code,
+            brokerError.SafeMessage,
+            "The restricted administrator broker did not establish a verified session.",
+            null,
+            journal.TransactionId,
+            isRollback ? ActionExecutionStage.Rollback : ActionExecutionStage.Elevation,
+            brokerError.RetryPossible,
+            false);
+        journal = journal with { Errors = journal.Errors.Add(error) };
+        journal = await TransitionTransactionAsync(
+            journal,
+            TransactionState.Failed,
+            CancellationToken.None,
+            complete: true);
+        await journalStore.ArchiveAsync(journal, CancellationToken.None);
+        return Result(journal, false, error.UserMessage);
     }
 
     private async Task<TransactionExecutionResult> CompletePreMutationCancellationAsync(
@@ -1231,6 +1456,10 @@ public sealed class ActionTransactionEngine(
         return JsonElement.DeepEquals(leftJson, rightJson);
     }
 
+    private static bool RequiresAdministrator(ActionTransactionPlan plan) =>
+        plan.Actions.Any(action =>
+            action.Plan.RequiredPrivilege == ActionPrivilegeLevel.Administrator);
+
     private ActionExecutionContext CreateContext(
         Guid transactionId,
         bool isDryRun,
@@ -1296,5 +1525,14 @@ public sealed class ActionTransactionEngine(
             plan.RestartRequirement,
             [error],
             error.UserMessage);
+    }
+
+    private sealed record PrivilegeOpenAttempt(
+        TransactionJournal Journal,
+        ActionPrivilegeOpenResult Result);
+
+    private sealed class SynchronousProgress<T>(Action<T> callback) : IProgress<T>
+    {
+        public void Report(T value) => callback(value);
     }
 }

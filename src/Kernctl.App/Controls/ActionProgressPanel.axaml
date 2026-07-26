@@ -16,12 +16,18 @@
           <TextBlock Classes="heading" Text="{Binding CurrentAction}" />
           <TextBlock Classes="caption" Text="{Binding LifecycleStage}" />
         </StackPanel>
-        <Border
-            Grid.Column="1"
-            Classes="status warning"
-            IsVisible="{Binding IsRollback}">
-          <TextBlock Classes="label" Text="ROLLING BACK" />
-        </Border>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+          <Border
+              Classes="status warning"
+              IsVisible="{Binding IsAdministratorRequest}">
+            <TextBlock Classes="label" Text="ADMINISTRATOR REQUEST" />
+          </Border>
+          <Border
+              Classes="status warning"
+              IsVisible="{Binding IsRollback}">
+            <TextBlock Classes="label" Text="ROLLING BACK" />
+          </Border>
+        </StackPanel>
       </Grid>
       <TextBlock Classes="body" Text="{Binding Message}" TextWrapping="Wrap" />
       <ProgressBar

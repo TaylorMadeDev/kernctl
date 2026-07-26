@@ -197,6 +197,21 @@ public sealed class FileActionJournalStore : IActionJournalStore
             throw new ActionEngineException("Transaction journal metadata is invalid.");
         }
 
+        if (journal.Elevation is { } elevation
+            && (elevation.RequestedAtUtc.Offset != TimeSpan.Zero
+                || (elevation.CompletedAtUtc is { } elevationCompleted
+                    && (elevationCompleted.Offset != TimeSpan.Zero
+                        || elevationCompleted < elevation.RequestedAtUtc))
+                || string.IsNullOrWhiteSpace(elevation.SafeOutcome)
+                || elevation.SafeOutcome.Length > 512
+                || (elevation.State == TransactionElevationState.Requested
+                    && elevation.CompletedAtUtc is not null)
+                || (elevation.State != TransactionElevationState.Requested
+                    && elevation.CompletedAtUtc is null)))
+        {
+            throw new ActionEngineException("Transaction elevation metadata is invalid.");
+        }
+
         var ordered = journal.Actions.OrderBy(action => action.Order).ToArray();
         if (ordered.Select(action => action.Order).Where((order, index) => order != index).Any()
             || ordered.Select(action => action.ActionId).Distinct(StringComparer.Ordinal).Count()

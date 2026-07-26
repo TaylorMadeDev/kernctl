@@ -44,6 +44,7 @@ public enum ActionExecutionStage
     Detection,
     Planning,
     Validation,
+    Elevation,
     Snapshot,
     Apply,
     Verification,
