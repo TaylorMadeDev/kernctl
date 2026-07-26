@@ -1,5 +1,7 @@
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Kernctl.Core.Actions;
 
@@ -10,11 +12,19 @@ public sealed record ActionJournalOptions(
 
 public sealed class FileActionJournalStore : IActionJournalStore
 {
+    private static readonly Action<ILogger, string, Exception?> LogJournalReadFailure =
+        LoggerMessage.Define<string>(
+            LogLevel.Warning,
+            new EventId(1101, nameof(LogJournalReadFailure)),
+            "Transaction journal {JournalFileName} could not be read safely.");
     private readonly ActionJournalOptions options;
     private readonly string activeDirectory;
     private readonly string archiveDirectory;
+    private readonly ILogger<FileActionJournalStore> logger;
 
-    public FileActionJournalStore(ActionJournalOptions options)
+    public FileActionJournalStore(
+        ActionJournalOptions options,
+        ILogger<FileActionJournalStore>? logger = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(options.RootDirectory);
         if (options.HistoryRetention < 1 || options.MaximumJournalBytes < 1024)
@@ -23,6 +33,7 @@ public sealed class FileActionJournalStore : IActionJournalStore
         }
 
         this.options = options with { RootDirectory = Path.GetFullPath(options.RootDirectory) };
+        this.logger = logger ?? NullLogger<FileActionJournalStore>.Instance;
         activeDirectory = Path.Combine(this.options.RootDirectory, "active");
         archiveDirectory = Path.Combine(this.options.RootDirectory, "archive");
     }
@@ -73,6 +84,7 @@ public sealed class FileActionJournalStore : IActionJournalStore
                     or JsonException
                     or ActionEngineException)
             {
+                LogJournalReadFailure(logger, Path.GetFileName(path), exception);
                 errors.Add(new(
                     Path.GetFileName(path),
                     exception is ActionEngineException
@@ -132,7 +144,7 @@ public sealed class FileActionJournalStore : IActionJournalStore
                     or JsonException
                     or ActionEngineException)
             {
-                // Malformed history is ignored rather than exposed as a valid user entry.
+                LogJournalReadFailure(logger, Path.GetFileName(path), exception);
             }
         }
 
