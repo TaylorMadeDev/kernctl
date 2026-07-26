@@ -7,13 +7,16 @@ namespace Kernctl.Core.Tests;
 public sealed class GamingPageViewModelTests
 {
     [Fact]
-    public void ExposesExactlySixToolsWithRequiredToggleDefaults()
+    public void ExposesExactlySixFunctionalNavigationTools()
     {
         var viewModel = CreateViewModel(out _);
 
         Assert.Equal(6, viewModel.Tools.Count);
-        Assert.True(viewModel.Tools.Single(tool => tool.Title == "Performance Mode").IsToggled);
-        Assert.False(viewModel.Tools.Single(tool => tool.Title == "FPS Monitoring").IsToggled);
+        Assert.All(viewModel.Tools, tool => Assert.NotNull(tool.Command));
+        Assert.All(viewModel.Tools, tool => Assert.True(tool.HasNavigation));
+        Assert.Equal(
+            "FPS provider unavailable.",
+            viewModel.Tools.Single(tool => tool.Title == "FPS Monitoring").Description);
     }
 
     [Fact]
@@ -32,14 +35,14 @@ public sealed class GamingPageViewModelTests
     }
 
     [Fact]
-    public async Task SampleMetricsAreClearlyLabelled()
+    public async Task SampleMetricsAreNeverPresentedAsLiveData()
     {
         var viewModel = CreateViewModel(out _);
 
         await viewModel.InitializeAsync(CancellationToken.None);
 
-        Assert.Equal("DEVELOPMENT SAMPLE", viewModel.MetricsStatus);
-        Assert.Equal("18%", viewModel.CpuValue);
+        Assert.Equal("METRICS UNAVAILABLE", viewModel.MetricsStatus);
+        Assert.Equal("Unavailable", viewModel.CpuValue);
     }
 
     private static GamingPageViewModel CreateViewModel(out ProfileService profiles)

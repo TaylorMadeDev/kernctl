@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Kernctl.App.ViewModels;
 
@@ -11,13 +12,15 @@ public sealed class ToolCardViewModel : ObservableObject
         string description,
         string icon,
         bool hasToggle,
-        bool initialToggleState = false)
+        bool initialToggleState = false,
+        IRelayCommand? command = null)
     {
         Title = title;
         Description = description;
         Icon = icon;
         HasToggle = hasToggle;
         IsToggled = initialToggleState;
+        Command = command;
     }
 
     public string Title { get; }
@@ -29,6 +32,8 @@ public sealed class ToolCardViewModel : ObservableObject
     public bool HasToggle { get; }
 
     public bool HasNavigation => !HasToggle;
+
+    public IRelayCommand? Command { get; }
 
     public string ToggleAccessibleLabel => $"{Title} {(IsToggled ? "enabled" : "disabled")}";
 

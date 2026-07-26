@@ -7,12 +7,14 @@ namespace Kernctl.App.Views;
 public sealed partial class MainWindow : Window, IDisposable
 {
     private readonly CancellationTokenSource lifetimeCancellation = new();
+    private bool closingAfterGamingShutdown;
     private bool disposed;
 
     public MainWindow()
     {
         InitializeComponent();
         Opened += OnOpened;
+        Closing += OnClosing;
         Closed += OnClosed;
     }
 
@@ -40,6 +42,25 @@ public sealed partial class MainWindow : Window, IDisposable
         ViewModel?.CancelThemePreviewOnExit();
         lifetimeCancellation.Cancel();
         Dispose();
+    }
+
+    private async void OnClosing(object? sender, WindowClosingEventArgs eventArgs)
+    {
+        if (closingAfterGamingShutdown || ViewModel?.Gaming.IsSessionActive is not true)
+        {
+            return;
+        }
+
+        eventArgs.Cancel = true;
+        try
+        {
+            await ViewModel.Gaming.ShutdownAsync();
+        }
+        finally
+        {
+            closingAfterGamingShutdown = true;
+            Close();
+        }
     }
 
     public void Dispose()

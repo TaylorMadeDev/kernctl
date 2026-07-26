@@ -216,6 +216,19 @@
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="{DynamicResource Radius.Medium}" />
   </Style>
+  <Style Selector="Button.tool-card-button">
+    <Setter Property="MinHeight" Value="106" />
+    <Setter Property="Padding" Value="{DynamicResource Card.Padding}" />
+    <Setter Property="Background" Value="{DynamicResource Brush.Surface.Primary}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border.Subtle}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Medium}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+  </Style>
+  <Style Selector="Button.tool-card-button:pointerover">
+    <Setter Property="Background" Value="{DynamicResource Brush.Surface.Secondary}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Text.Muted}" />
+  </Style>
   <Style Selector="Border.status">
     <Setter Property="Margin" Value="0,0,7,0" />
     <Setter Property="Padding" Value="9,5" />

@@ -6,8 +6,9 @@
 portable state and contracts. `Kernctl.Broker.Protocol` contains strict DTOs and
 framing rules, `Kernctl.Broker.Client` owns UAC launch and the unelevated pipe client,
 and the separate `Kernctl.Broker` executable owns verification and dispatch.
-`Kernctl.Platform.Windows` still implements only harmless, read-only Windows services
-plus the narrow reversible current-user power-scheme adapter.
+`Kernctl.Platform.Windows` implements read-only Windows metrics and process
+inspection plus the narrow reversible current-user power-scheme and configured-game
+priority adapters.
 
 Dependencies point inward:
 
@@ -154,9 +155,13 @@ cancellation, and rollback work to the existing action engine. See
 ## Current milestone
 
 Profiles, profile history, active selection, and theme preferences are persisted in
-the current user's local application-data directory. Metrics remain deliberately
-labelled sample values. Production actions are limited to existing known Windows
-power-scheme selection and two kernctl-local Boolean settings. The elevated broker
-still contains only non-mutating information, capability, ping, and shutdown
-diagnostics. No registry, service, power-scheme editing, arbitrary process, network,
-or unrelated user-file mutation code exists.
+the current user's local application-data directory. The Gaming library adds
+versioned local metadata, read-only Steam/Epic providers, direct validated executable
+launch, process-tree monitoring, redacted session history, and fixed overlay
+inspection. Windows CPU and memory metrics are read through documented APIs.
+Production actions are limited to existing known Windows power-scheme selection,
+two kernctl-local Boolean settings, and the exact configured game process selected
+by an active session. The elevated broker still contains only non-mutating
+information, capability, ping, and shutdown diagnostics. No registry, service,
+power-scheme editing, arbitrary process target, network, or unrelated user-file
+mutation code exists. See [gaming.md](gaming.md).

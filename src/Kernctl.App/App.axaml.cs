@@ -9,6 +9,7 @@ using Kernctl.App.ViewModels.Pages;
 using Kernctl.App.ViewModels.Profiles;
 using Kernctl.App.Views;
 using Kernctl.Core.Actions;
+using Kernctl.Core.Gaming;
 using Kernctl.Core.Services;
 using Kernctl.Core.Profiles;
 using Kernctl.Core.Themes;
@@ -62,7 +63,12 @@ public sealed partial class App : Application
         services.AddSingleton<IProfileService, ProfileService>();
         services.AddSingleton<IPowerSchemeService, WindowsPowerSchemeService>();
         services.AddSingleton<IKernctlFeatureState, KernctlFeatureState>();
-        services.AddSingleton<ISystemMetricsService, DevelopmentSystemMetricsService>();
+        services.AddSingleton<ISystemMetricsService, WindowsSystemMetricsService>();
+        services.AddSingleton<IGameProcessService, WindowsGameProcessService>();
+        services.AddSingleton<IGameProcessTreeMonitor, WindowsGameProcessTreeMonitor>();
+        services.AddSingleton<IGamePriorityTargetContext, GamePriorityTargetContext>();
+        services.AddSingleton<IFpsProvider, UnavailableFpsProvider>();
+        services.AddSingleton<IOverlayService, WindowsOverlayService>();
         services.AddSingleton(BrokerClientOptions.Default);
         services.AddSingleton<IBrokerExecutableResolver, BrokerExecutableResolver>();
         services.AddSingleton<ICurrentProcessIdentityProvider, CurrentProcessIdentityProvider>();
@@ -96,6 +102,18 @@ public sealed partial class App : Application
                 provider.GetRequiredService<IKernctlFeatureState>(),
                 KernctlPreference.PerformanceMode,
                 desiredValue: true),
+            new GameProcessPrioritySystemAction(
+                provider.GetRequiredService<IGameProcessService>(),
+                provider.GetRequiredService<IGamePriorityTargetContext>(),
+                GameProcessPriority.Normal),
+            new GameProcessPrioritySystemAction(
+                provider.GetRequiredService<IGameProcessService>(),
+                provider.GetRequiredService<IGamePriorityTargetContext>(),
+                GameProcessPriority.AboveNormal),
+            new GameProcessPrioritySystemAction(
+                provider.GetRequiredService<IGameProcessService>(),
+                provider.GetRequiredService<IGamePriorityTargetContext>(),
+                GameProcessPriority.High),
         ]));
         services.AddSingleton(_ => new ActionJournalOptions(Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -112,6 +130,11 @@ public sealed partial class App : Application
         services.AddSingleton<IProfileCatalogService, ProfileCatalogService>();
         services.AddSingleton<IProfileEngine, ProfileEngine>();
         services.AddSingleton<IAutomaticProfileSwitcher, AutomaticProfileSwitcher>();
+        services.AddSingleton<IGameLibraryStore>(_ => new GameLibraryStore(applicationDataRoot));
+        services.AddSingleton<IGameDiscoveryProvider, SteamGameDiscoveryProvider>();
+        services.AddSingleton<IGameDiscoveryProvider, EpicGameDiscoveryProvider>();
+        services.AddSingleton<IGameLibraryService, GameLibraryService>();
+        services.AddSingleton<IGameSessionCoordinator, GameSessionCoordinator>();
         services.AddSingleton<IProfileFileDialogService, ProfileFileDialogService>();
         services.AddSingleton<ProfileManagerViewModel>();
         services.AddSingleton<ActionReviewDialogViewModel>();

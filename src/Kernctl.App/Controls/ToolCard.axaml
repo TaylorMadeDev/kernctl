@@ -6,7 +6,11 @@
     xmlns:controls="using:Kernctl.App.Controls"
     xmlns:services="using:Kernctl.App.Services"
     xmlns:viewModels="using:Kernctl.App.ViewModels">
-  <Border Classes="tool-card">
+  <Grid>
+    <Button
+      Classes="tool-card-button"
+      Command="{Binding Command}"
+      IsVisible="{Binding HasNavigation}">
     <Grid ColumnDefinitions="48,*,Auto">
       <controls:SvgIcon
           Width="30"
@@ -33,5 +37,26 @@
           IconBrush="{DynamicResource Brush.Text.Primary}"
           Source="{x:Static services:IconCatalog.Chevron}" />
     </Grid>
-  </Border>
+    </Button>
+    <Border Classes="tool-card" IsVisible="{Binding HasToggle}">
+    <Grid ColumnDefinitions="48,*,Auto">
+      <controls:SvgIcon
+          Width="30"
+          Height="30"
+          HorizontalAlignment="Left"
+          VerticalAlignment="Center"
+          IconBrush="{DynamicResource Brush.Accent}"
+          Source="{Binding Icon}" />
+      <StackPanel Grid.Column="1" Margin="0,0,10,0" VerticalAlignment="Center" Spacing="4">
+        <TextBlock Classes="heading" FontSize="{DynamicResource Font.Size.ToolHeading}" Text="{Binding Title}" />
+        <TextBlock Classes="body" FontSize="{DynamicResource Font.Size.ToolBody}" Text="{Binding Description}" />
+      </StackPanel>
+      <ToggleSwitch
+          Grid.Column="2"
+          Classes="kernctl"
+          IsChecked="{Binding IsToggled}"
+          ToolTip.Tip="{Binding ToggleAccessibleLabel}" />
+    </Grid>
+    </Border>
+  </Grid>
 </UserControl>

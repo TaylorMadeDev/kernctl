@@ -6,14 +6,17 @@ kernctl is an early-stage Windows control centre for storage, gaming, performanc
 network, application, and safe system-management workflows. This milestone provides
 the repository architecture, a polished non-destructive Avalonia UI, a complete
 runtime theme customizer under **Settings → Appearance**, the transactional safety
-engine, a restricted short-lived Windows elevation broker, and a safe transactional
-system-profile builder.
+engine, a restricted short-lived Windows elevation broker, a safe transactional
+system-profile builder, and a functional local game library with reversible
+per-session controls.
 
 > [!IMPORTANT]
 > kernctl is not production-ready. A manually confirmed profile may select one of
-> three existing Windows power schemes through the supported Windows API. No scheme
-> values, registry settings, services, security controls, or arbitrary processes are
-> modified.
+> three existing Windows power schemes through the supported Windows API. A confirmed
+> game launch may directly start one configured `.exe` and temporarily set only that
+> process to Normal, Above Normal, or High priority through the transaction engine.
+> No scheme values, registry settings, services, security controls, or unrelated
+> processes are modified.
 
 ## Design reference
 
@@ -63,7 +66,7 @@ dotnet run --project src/Kernctl.App/Kernctl.App.csproj
 - A restrained, high-contrast dark interface with token-driven styling.
 - Reusable controls, local vector assets, and clear keyboard focus.
 - MVVM separation with cached page state and dependency injection.
-- Honest UI: sample values and unavailable modules are identified explicitly.
+- Honest UI: genuine values and unavailable providers are identified explicitly.
 - Runtime themes update shared Avalonia resources without recreating pages or restarting.
 - Future changes run through versioned plans, durable rollback snapshots, verification,
   reverse-order recovery, and structured history.
@@ -89,6 +92,19 @@ Journals are stored without elevation under:
 
 See [Action engine and rollback safety](docs/action-engine.md) for the lifecycle,
 state machines, journal format, and future action requirements.
+
+## Gaming library
+
+The Gaming page now provides manual, Steam, and Epic local discovery; searchable
+grid/list library views; validated per-game details; launch confirmation; serialized
+profile switching; transactional process priority; descendant monitoring; redacted
+session history; and read-only inspection of known overlay applications. Discovery
+never signs in or edits launcher state, launch never invokes a shell, Realtime
+priority is rejected, and no FPS value is fabricated.
+
+See [Gaming library and session safety](docs/gaming.md) for provider support,
+persistence, process boundaries, rollback behaviour, metrics, privacy, limitations,
+and tests.
 
 ## System profiles
 
@@ -143,7 +159,9 @@ or personal information.
 - The UI process does not run permanently elevated.
 - No registry, service, power-plan editing, driver, network, arbitrary-process, or
   unrelated user-file changes are implemented. Profile application may select an
-  existing known Windows power scheme after explicit review.
+  existing known Windows power scheme after explicit review. A game session may
+  start one validated configured `.exe` and transactionally adjust only its bounded
+  process-priority class.
 - Future actions must detect, plan, validate, snapshot, apply, verify, and report an
   honest committed or rollback state.
 - Sensitive credentials, cookies, and tokens are never collected or logged.

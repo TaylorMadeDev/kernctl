@@ -4,4 +4,5 @@ public sealed record SearchResultViewModel(
     string Title,
     string Category,
     string DestinationTitle,
-    string SearchText);
+    string SearchText,
+    Action? Activation = null);

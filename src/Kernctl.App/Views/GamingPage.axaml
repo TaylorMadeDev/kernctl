@@ -4,113 +4,500 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Kernctl.App.Controls"
+    xmlns:gaming="using:Kernctl.App.ViewModels.Gaming"
     xmlns:pages="using:Kernctl.App.ViewModels.Pages"
     xmlns:services="using:Kernctl.App.Services"
     xmlns:viewModels="using:Kernctl.App.ViewModels">
-  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Margin="36,28,36,36" Spacing="{DynamicResource Page.Spacing}">
-      <StackPanel Spacing="3">
-        <TextBlock Classes="display" Text="Gaming" />
-        <TextBlock Classes="body" Text="Configure your system for gaming" />
-      </StackPanel>
+  <Grid>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+      <Grid Margin="36,28,36,36">
+        <StackPanel IsVisible="{Binding IsDashboard}" Spacing="{DynamicResource Page.Spacing}">
+          <StackPanel Spacing="3">
+            <TextBlock Classes="display" Text="Gaming" />
+            <TextBlock Classes="body" Text="A safe local game library and per-game control centre" />
+          </StackPanel>
 
-      <ItemsControl ItemsSource="{Binding Tools}">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <controls:AdaptiveCardPanel
-                HorizontalSpacing="{DynamicResource Grid.Gap}"
-                MaximumColumns="3"
-                MinimumItemWidth="286"
-                VerticalSpacing="{DynamicResource Grid.Gap}" />
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="viewModels:ToolCardViewModel">
-            <controls:ToolCard />
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+          <ItemsControl ItemsSource="{Binding Tools}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <controls:AdaptiveCardPanel
+                    HorizontalSpacing="{DynamicResource Grid.Gap}"
+                    MaximumColumns="3"
+                    MinimumItemWidth="250"
+                    VerticalSpacing="{DynamicResource Grid.Gap}" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="viewModels:ToolCardViewModel">
+                <controls:ToolCard />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
 
-      <StackPanel Spacing="12">
-        <Grid ColumnDefinitions="*,Auto">
-          <TextBlock
-              VerticalAlignment="Center"
-              Classes="caption"
-              FontSize="{DynamicResource Font.Size.Caption}"
-              Text="ACTIVE PROFILE" />
-          <Border
-              Grid.Column="1"
-              Padding="9,5"
-              Background="{DynamicResource Brush.Accent.Subtle}"
-              CornerRadius="{DynamicResource Radius.Pill}">
-            <TextBlock
-                Classes="caption"
-                Foreground="{DynamicResource Brush.Accent}"
-                Text="{Binding MetricsStatus}" />
-          </Border>
-        </Grid>
+          <StackPanel Spacing="12">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock VerticalAlignment="Center" Classes="caption" Text="LIVE GAMING STATE" />
+              <Border
+                  Grid.Column="1"
+                  Padding="9,5"
+                  Background="{DynamicResource Brush.Accent.Subtle}"
+                  CornerRadius="{DynamicResource Radius.Pill}">
+                <TextBlock Classes="caption" Foreground="{DynamicResource Brush.Accent}" Text="{Binding MetricsStatus}" />
+              </Border>
+            </Grid>
+            <Border Classes="profile-card">
+              <WrapPanel>
+                <Grid Width="210" Margin="0,5,16,5" ColumnDefinitions="36,*">
+                  <Ellipse Width="22" Height="22" Fill="{DynamicResource Brush.Accent}" />
+                  <StackPanel Grid.Column="1" Spacing="2">
+                    <TextBlock FontSize="{DynamicResource Font.Size.Profile}" FontWeight="SemiBold" Text="{Binding ActiveProfileName}" />
+                    <TextBlock Classes="body" FontSize="{DynamicResource Font.Size.ToolBody}" Text="{Binding ActiveProfileDescription}" />
+                  </StackPanel>
+                </Grid>
+                <controls:MetricDisplay
+                    Width="104"
+                    Margin="10,5"
+                    Icon="{x:Static services:IconCatalog.Gaming}"
+                    Label="Installed"
+                    Value="{Binding InstalledGameCount}" />
+                <controls:MetricDisplay
+                    Width="114"
+                    Margin="10,5"
+                    Icon="{x:Static services:IconCatalog.Processor}"
+                    Label="Priority"
+                    Value="{Binding DefaultPriority}" />
+                <controls:MetricDisplay
+                    Width="110"
+                    Margin="10,5"
+                    Icon="{x:Static services:IconCatalog.Display}"
+                    Label="Overlays"
+                    Value="{Binding OverlayCount}" />
+                <controls:MetricDisplay
+                    Width="118"
+                    Margin="10,5"
+                    Icon="{x:Static services:IconCatalog.User}"
+                    Label="Auto profile"
+                    Value="{Binding AutoProfileStatus}" />
+                <Button
+                    Margin="10,5"
+                    Classes="outline"
+                    Command="{Binding OpenProfileDialogCommand}"
+                    Content="Profiles" />
+              </WrapPanel>
+            </Border>
+          </StackPanel>
+        </StackPanel>
 
-        <Border
-            Padding="{DynamicResource Card.Padding}"
-            Background="{DynamicResource Brush.Surface.Primary}"
-            BorderBrush="{DynamicResource Brush.Border.Subtle}"
-            BorderThickness="1"
-            CornerRadius="{DynamicResource Radius.Medium}">
+        <StackPanel IsVisible="{Binding IsLibrary}" Spacing="{DynamicResource Page.Spacing}">
+          <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
+            <Button Classes="subtle" Command="{Binding BackToDashboardCommand}" Content="Back" />
+            <StackPanel Grid.Column="1" Spacing="2">
+              <TextBlock Classes="display" Text="Game library" />
+              <TextBlock Classes="body" Text="{Binding LibraryStatus}" />
+            </StackPanel>
+            <Button Grid.Column="2" Classes="outline" Command="{Binding RescanCommand}" Content="Rescan" />
+            <Button Grid.Column="3" Command="{Binding AddGameCommand}" Content="Add executable" />
+          </Grid>
+          <Grid ColumnDefinitions="*,180" ColumnSpacing="12">
+            <TextBox PlaceholderText="Search local games" Text="{Binding LibraryQuery}" />
+            <ComboBox
+                Grid.Column="1"
+                ItemsSource="{Binding SourceChoices}"
+                SelectedItem="{Binding SelectedSource}" />
+          </Grid>
           <WrapPanel>
-            <Grid
-                Width="224"
-                Margin="0,5,16,5"
-                ColumnDefinitions="36,*"
-                VerticalAlignment="Center">
-              <Ellipse Width="22" Height="22" Fill="{DynamicResource Brush.Accent}" />
-              <StackPanel Grid.Column="1" Spacing="2">
-                <TextBlock FontSize="{DynamicResource Font.Size.Profile}" FontWeight="SemiBold" Text="{Binding ActiveProfileName}" />
-                <TextBlock Classes="body" FontSize="{DynamicResource Font.Size.ToolBody}" Text="{Binding ActiveProfileDescription}" />
+            <TextBlock Margin="0,0,8,0" VerticalAlignment="Center" Classes="caption" Text="SORT" />
+            <ComboBox
+                Width="150"
+                Margin="0,0,12,0"
+                ItemsSource="{Binding SortChoices}"
+                SelectedItem="{Binding SelectedSort}" />
+            <Button Margin="0,0,8,0" Classes="subtle" Command="{Binding ShowGridCommand}" Content="Grid" />
+            <Button Margin="0,0,8,0" Classes="subtle" Command="{Binding ShowListCommand}" Content="List" />
+            <Button Classes="subtle" Command="{Binding ToggleDensityCommand}" Content="{Binding DensityLabel}" />
+          </WrapPanel>
+          <ItemsControl ItemsSource="{Binding LibraryErrors}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Classes="status warning">
+                  <TextBlock Classes="caption" Text="{Binding}" />
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <ItemsControl IsVisible="{Binding IsGridView}" ItemsSource="{Binding FilteredGames}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <controls:AdaptiveCardPanel
+                    HorizontalSpacing="{DynamicResource Grid.Gap}"
+                    MaximumColumns="3"
+                    MinimumItemWidth="250"
+                    VerticalSpacing="{DynamicResource Grid.Gap}" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="gaming:GameCardViewModel">
+                <Border Classes="profile-card" MinHeight="{Binding GridCardMinimumHeight}">
+                  <Grid RowDefinitions="Auto,*,Auto">
+                    <Grid ColumnDefinitions="40,*,Auto">
+                      <Border
+                          Width="34"
+                          Height="34"
+                          Background="{DynamicResource Brush.Accent.Subtle}"
+                          CornerRadius="{DynamicResource Radius.Small}">
+                        <controls:SvgIcon
+                            Width="18"
+                            Height="18"
+                            IconBrush="{DynamicResource Brush.Accent}"
+                            Source="{x:Static services:IconCatalog.Gaming}" />
+                      </Border>
+                      <StackPanel Grid.Column="1" Margin="10,0,6,0" Spacing="2">
+                        <TextBlock Classes="heading" Text="{Binding Name}" />
+                        <TextBlock Classes="caption" Text="{Binding Source}" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="2" Classes="caption" Text="{Binding InstallState}" />
+                    </Grid>
+                    <StackPanel Grid.Row="1" Margin="0,14,0,12" Spacing="3">
+                      <TextBlock Classes="body" Text="{Binding ProfileName}" />
+                      <TextBlock Classes="caption" Text="{Binding LastPlayed}" />
+                    </StackPanel>
+                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                      <Button Classes="subtle" Command="{Binding OpenDetailsCommand}" Content="Details" />
+                      <Button Grid.Column="1" Command="{Binding RequestLaunchCommand}" Content="Launch" />
+                    </Grid>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <ItemsControl IsVisible="{Binding IsListView}" ItemsSource="{Binding FilteredGames}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="gaming:GameCardViewModel">
+                <Border
+                    Margin="0,0,0,8"
+                    Classes="profile-card"
+                    MinHeight="{Binding ListCardMinimumHeight}">
+                  <Grid ColumnDefinitions="40,2*,*,*,Auto,Auto" ColumnSpacing="10">
+                    <Border
+                        Width="34"
+                        Height="34"
+                        Background="{DynamicResource Brush.Accent.Subtle}"
+                        CornerRadius="{DynamicResource Radius.Small}">
+                      <controls:SvgIcon
+                          Width="18"
+                          Height="18"
+                          IconBrush="{DynamicResource Brush.Accent}"
+                          Source="{x:Static services:IconCatalog.Gaming}" />
+                    </Border>
+                    <StackPanel Grid.Column="1">
+                      <TextBlock Classes="label" Text="{Binding Name}" />
+                      <TextBlock Classes="caption" Text="{Binding LastPlayed}" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Classes="body" Text="{Binding Source}" />
+                    <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                      <TextBlock Classes="body" Text="{Binding InstallState}" />
+                      <TextBlock Classes="caption" Text="{Binding ProfileName}" />
+                    </StackPanel>
+                    <Button Grid.Column="4" Classes="subtle" Command="{Binding OpenDetailsCommand}" Content="Details" />
+                    <Button Grid.Column="5" Command="{Binding RequestLaunchCommand}" Content="Launch" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <StackPanel IsVisible="{Binding IsDetails}" Spacing="{DynamicResource Page.Spacing}">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+            <Button Classes="subtle" Command="{Binding BackToLibraryCommand}" Content="Back" />
+            <StackPanel Grid.Column="1">
+              <TextBlock Classes="display" Text="Game details" />
+              <TextBlock Classes="body" Text="Validate the direct executable and configure only this game." />
+            </StackPanel>
+          </Grid>
+          <WrapPanel>
+            <TextBlock Margin="0,0,18,0" Classes="caption" Text="{Binding SelectedGame.Source}" />
+            <TextBlock Margin="0,0,18,0" Classes="caption" Text="{Binding SelectedGame.InstallState}" />
+            <TextBlock Classes="caption" Text="{Binding SelectedGame.Game.ExternalId}" />
+          </WrapPanel>
+          <Border Classes="profile-card">
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="20" RowDefinitions="Auto,Auto,Auto,Auto">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="label" Text="Display name" />
+                <TextBox Text="{Binding DetailName}" />
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="6">
+                <TextBlock Classes="label" Text="Executable" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                  <TextBox IsReadOnly="True" Text="{Binding DetailExecutablePath}" />
+                  <Button Grid.Column="1" Classes="outline" Command="{Binding PickDetailExecutableCommand}" Content="Choose" />
+                </Grid>
+              </StackPanel>
+              <StackPanel Grid.Row="1" Margin="0,16,0,0" Spacing="6">
+                <TextBlock Classes="label" Text="Working directory" />
+                <TextBox Text="{Binding DetailWorkingDirectory}" />
+              </StackPanel>
+              <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,16,0,0" Spacing="6">
+                <TextBlock Classes="label" Text="Process priority" />
+                <ComboBox ItemsSource="{Binding PriorityChoices}" SelectedItem="{Binding DetailPriority}" />
+              </StackPanel>
+              <StackPanel Grid.Row="2" Margin="0,16,0,0" Spacing="6">
+                <TextBlock Classes="label" Text="Profile" />
+                <ComboBox
+                    ItemsSource="{Binding GamingProfiles}"
+                    SelectedValue="{Binding DetailProfileId}"
+                    SelectedValueBinding="{Binding Id}">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="pages:GamingProfileOption">
+                      <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+              </StackPanel>
+              <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,16,0,0" Spacing="10">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                  <ToggleSwitch Classes="kernctl" IsChecked="{Binding DetailAutoProfile}" />
+                  <TextBlock Grid.Column="1" VerticalAlignment="Center" Classes="body" Text="Auto-apply assigned profile" />
+                </Grid>
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                  <ToggleSwitch Classes="kernctl" IsChecked="{Binding DetailRestoreProfile}" />
+                  <TextBlock Grid.Column="1" VerticalAlignment="Center" Classes="body" Text="Restore previous profile on exit" />
+                </Grid>
+              </StackPanel>
+              <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Margin="0,16,0,0" Spacing="6">
+                <TextBlock Classes="label" Text="Launch arguments (one literal argument per line)" />
+                <TextBox
+                    MinHeight="82"
+                    AcceptsReturn="True"
+                    Text="{Binding DetailArguments}"
+                    TextWrapping="NoWrap" />
+                <TextBlock
+                    Classes="caption"
+                    Text="Arguments are passed as tokens through ProcessStartInfo.ArgumentList. kernctl never constructs a shell command." />
               </StackPanel>
             </Grid>
+          </Border>
+          <TextBlock Classes="validation" Text="{Binding OperationStatus}" />
+          <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
+            <Button Classes="danger-outline" Command="{Binding RemoveGameCommand}" Content="Remove from library" />
+            <Button Grid.Column="2" Classes="outline" Command="{Binding SaveDetailsCommand}" Content="Save" />
+            <Button Grid.Column="3" Command="{Binding RequestSelectedLaunchCommand}" Content="Review launch" />
+          </Grid>
+          <StackPanel Spacing="8">
+            <TextBlock Classes="section-title" Text="RECENT SESSIONS" />
+            <TextBlock Classes="body" Text="Session history is redacted and retains duration, outcome, resource metrics, profile, and priority—not command lines, environment data, or process IDs." />
+            <ItemsControl ItemsSource="{Binding RecentSessions}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="pages:GameSessionItemViewModel">
+                  <Border Margin="0,4,0,0" Classes="profile-card">
+                    <Grid ColumnDefinitions="135,100,70,100,150,*" ColumnSpacing="10">
+                      <TextBlock Classes="body" Text="{Binding Started}" />
+                      <TextBlock Grid.Column="1" Classes="body" Text="{Binding Outcome}" />
+                      <TextBlock Grid.Column="2" Classes="body" Text="{Binding Duration}" />
+                      <TextBlock Grid.Column="3" Classes="body" Text="{Binding Priority}" />
+                      <TextBlock Grid.Column="4" Classes="caption" Text="{Binding Resources}" />
+                      <TextBlock Grid.Column="5" Classes="caption" Text="{Binding Summary}" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </StackPanel>
 
-            <Border
-                Width="118"
-                Margin="0,5,12,5"
-                BorderBrush="{DynamicResource Brush.Border.Subtle}"
-                BorderThickness="1,0,0,0">
-              <controls:MetricDisplay
-                  Margin="16,0,0,0"
-                  Icon="{x:Static services:IconCatalog.Processor}"
-                  Label="CPU"
-                  Value="{Binding CpuValue}" />
-            </Border>
-            <Border
-                Width="118"
-                Margin="0,5,12,5"
-                BorderBrush="{DynamicResource Brush.Border.Subtle}"
-                BorderThickness="1,0,0,0">
-              <controls:MetricDisplay
-                  Margin="16,0,0,0"
-                  Icon="{x:Static services:IconCatalog.Memory}"
-                  Label="RAM"
-                  Value="{Binding MemoryValue}" />
-            </Border>
-            <Border
-                Width="138"
-                Margin="0,5,12,5"
-                BorderBrush="{DynamicResource Brush.Border.Subtle}"
-                BorderThickness="1,0,0,0">
-              <controls:MetricDisplay
-                  Margin="16,0,0,0"
-                  Icon="{x:Static services:IconCatalog.Power}"
-                  Label="Power"
-                  Value="{Binding PowerValue}" />
-            </Border>
-            <Button
-                Margin="0,5"
-                VerticalAlignment="Center"
-                Classes="outline"
-                Command="{Binding OpenProfileDialogCommand}"
-                Content="Change Profile" />
-          </WrapPanel>
-        </Border>
-      </StackPanel>
-    </StackPanel>
-  </ScrollViewer>
+        <StackPanel IsVisible="{Binding IsPriority}" Spacing="{DynamicResource Page.Spacing}">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+            <Button Classes="subtle" Command="{Binding BackToDashboardCommand}" Content="Back" />
+            <StackPanel Grid.Column="1">
+              <TextBlock Classes="display" Text="Process priority" />
+              <TextBlock Classes="body" Text="A bounded setting for configured game processes only" />
+            </StackPanel>
+          </Grid>
+          <Border Classes="profile-card">
+            <StackPanel Spacing="16">
+              <TextBlock Classes="heading" Text="Default for newly added games" />
+              <ComboBox Width="240" HorizontalAlignment="Left" ItemsSource="{Binding PriorityChoices}" SelectedItem="{Binding DefaultPriority}" />
+              <TextBlock
+                  Classes="body"
+                  Text="Normal is recommended. Above Normal is a modest scheduling hint. High can reduce responsiveness for other applications and does not guarantee more FPS. Realtime is never available." />
+              <TextBlock
+                  Classes="caption"
+                  Text="kernctl snapshots the original class, applies through the transaction engine, verifies the change, and restores it at session exit. Access-denied and exited-process conditions are reported without retry loops." />
+              <Button
+                  Width="170"
+                  HorizontalAlignment="Left"
+                  Command="{Binding SaveGamingPreferencesCommand}"
+                  Content="Save default" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+        <StackPanel IsVisible="{Binding IsAutoProfile}" Spacing="{DynamicResource Page.Spacing}">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+            <Button Classes="subtle" Command="{Binding BackToDashboardCommand}" Content="Back" />
+            <StackPanel Grid.Column="1">
+              <TextBlock Classes="display" Text="Auto Profile" />
+              <TextBlock Classes="body" Text="Explicit, per-game profile activation with reliable restoration" />
+            </StackPanel>
+          </Grid>
+          <Border Classes="profile-card">
+            <StackPanel Spacing="15">
+              <ToggleSwitch
+                  Classes="kernctl"
+                  HorizontalAlignment="Left"
+                  IsChecked="{Binding AutomaticProfilesEnabled}" />
+              <TextBlock Classes="heading" Text="{Binding AutoProfileStatus}" />
+              <TextBlock
+                  Classes="body"
+                  Text="Global automatic profile handling must be enabled here and on an individual game. If several launches conflict, kernctl serializes session setup instead of racing profile changes." />
+              <TextBlock
+                  Classes="caption"
+                  Text="Configure the assigned profile, restore-on-exit behaviour, and executable identity in each game’s Details page. Profile actions still use milestone 5 detection, review, snapshot, verification, and rollback." />
+              <TextBlock Classes="section-title" Text="RECENT ACTIVATION" />
+              <TextBlock Classes="body" Text="{Binding RecentAutoActivation}" />
+              <WrapPanel>
+                <Button Margin="0,0,10,0" Command="{Binding SaveGamingPreferencesCommand}" Content="Save setting" />
+                <Button Classes="outline" Command="{Binding OpenProfileDialogCommand}" Content="Open profile builder" />
+              </WrapPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+        <StackPanel IsVisible="{Binding IsOverlays}" Spacing="{DynamicResource Page.Spacing}">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+            <Button Classes="subtle" Command="{Binding BackToDashboardCommand}" Content="Back" />
+            <StackPanel Grid.Column="1">
+              <TextBlock Classes="display" Text="Overlay Manager" />
+              <TextBlock Classes="body" Text="Read-only inspection of known local overlay application identities" />
+            </StackPanel>
+          </Grid>
+          <TextBlock
+              Classes="caption"
+              Text="No process is terminated automatically. Exit sends a graceful close request only after explicit confirmation; kernctl does not force-kill an unresponsive application." />
+          <ItemsControl ItemsSource="{Binding Overlays}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="gaming:OverlayItemViewModel">
+                <Border Margin="0,0,0,10" Classes="profile-card">
+                  <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                    <StackPanel Spacing="3">
+                      <TextBlock Classes="heading" Text="{Binding Name}" />
+                      <TextBlock Classes="body" Text="{Binding Capabilities}" />
+                      <TextBlock Classes="caption" Text="{Binding Publisher}" />
+                      <TextBlock Classes="caption" Text="{Binding Path}" />
+                      <TextBlock Classes="caption" Text="{Binding Status}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                      <Button Classes="subtle" Command="{Binding ToggleTrackedCommand}" Content="{Binding TrackingLabel}" />
+                      <Button Classes="outline" Command="{Binding OpenCommand}" Content="Open app" />
+                      <Button Classes="danger-outline" Command="{Binding RequestExitCommand}" Content="Exit" />
+                    </StackPanel>
+                    <Border
+                        Grid.Row="1"
+                        Grid.ColumnSpan="2"
+                        Margin="0,12,0,0"
+                        Classes="status warning"
+                        IsVisible="{Binding IsExitConfirmationVisible}">
+                      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                        <TextBlock Classes="caption" Text="Ask this known application to close? Unsaved work in it may be lost." />
+                        <Button Grid.Column="1" Classes="subtle" Command="{Binding CancelExitCommand}" Content="Cancel" />
+                        <Button Grid.Column="2" Classes="danger" Command="{Binding ConfirmExitCommand}" Content="Confirm exit" />
+                      </Grid>
+                    </Border>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <StackPanel IsVisible="{Binding IsFps}" Spacing="{DynamicResource Page.Spacing}">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+            <Button Classes="subtle" Command="{Binding BackToDashboardCommand}" Content="Back" />
+            <StackPanel Grid.Column="1">
+              <TextBlock Classes="display" Text="Session monitoring" />
+              <TextBlock Classes="body" Text="Genuine process metrics only" />
+            </StackPanel>
+          </Grid>
+          <Border Classes="profile-card">
+            <StackPanel Spacing="14">
+              <TextBlock Classes="heading" Foreground="{DynamicResource Brush.Warning}" Text="{Binding FpsStatus}" />
+              <TextBlock
+                  Classes="body"
+                  Text="This build has no reviewed FPS provider. It does not inject code, read game memory, bypass anti-cheat, invoke third-party capture tools, or display estimated FPS." />
+              <WrapPanel>
+                <controls:MetricDisplay
+                    Width="130"
+                    Icon="{x:Static services:IconCatalog.Processor}"
+                    Label="CPU"
+                    Value="{Binding CpuValue}" />
+                <controls:MetricDisplay
+                    Width="150"
+                    Icon="{x:Static services:IconCatalog.Memory}"
+                    Label="Memory"
+                    Value="{Binding MemoryValue}" />
+                <controls:MetricDisplay
+                    Width="160"
+                    Icon="{x:Static services:IconCatalog.Power}"
+                    Label="Active profile"
+                    Value="{Binding ActiveProfileName}" />
+              </WrapPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Grid>
+    </ScrollViewer>
+
+    <Border
+        Background="{DynamicResource Brush.Overlay}"
+        IsVisible="{Binding IsLaunchConfirmationOpen}"
+        ZIndex="20">
+      <Border Classes="dialog" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Spacing="18">
+          <TextBlock Classes="heading" Text="Review game launch" />
+          <TextBlock Classes="body" Text="{Binding LaunchConfirmationMessage}" />
+          <TextBlock
+              Classes="caption"
+              Text="The executable path, working directory, and literal argument list are validated again immediately before launch." />
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+            <Button Grid.Column="1" Classes="outline" Command="{Binding CancelLaunchCommand}" Content="Cancel" />
+            <Button Grid.Column="2" Command="{Binding ConfirmLaunchCommand}" Content="Launch and monitor" />
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Border>
+
+    <Border
+        Background="{DynamicResource Brush.Overlay}"
+        IsVisible="{Binding IsAddConfirmationOpen}"
+        ZIndex="21">
+      <Border Classes="dialog" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Spacing="18">
+          <TextBlock Classes="heading" Text="Confirm unusual executable location" />
+          <TextBlock Classes="body" Text="{Binding AddConfirmationMessage}" />
+          <TextBlock Classes="caption" Text="Only continue if you trust the executable and its publisher." />
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+            <Button Grid.Column="1" Classes="outline" Command="{Binding CancelAddCommand}" Content="Cancel" />
+            <Button Grid.Column="2" Command="{Binding ConfirmAddCommand}" Content="Add anyway" />
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Border>
+
+    <Border
+        Background="{DynamicResource Brush.Overlay}"
+        IsVisible="{Binding IsDetailConfirmationOpen}"
+        ZIndex="22">
+      <Border Classes="dialog" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Spacing="18">
+          <TextBlock Classes="heading" Text="Confirm unusual executable location" />
+          <TextBlock Classes="body" Text="{Binding DetailConfirmationMessage}" />
+          <TextBlock Classes="caption" Text="The warning will remain visible in game details and every launch review." />
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+            <Button Grid.Column="1" Classes="outline" Command="{Binding CancelDetailSaveCommand}" Content="Cancel" />
+            <Button Grid.Column="2" Command="{Binding ConfirmDetailSaveCommand}" Content="Save anyway" />
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Border>
+  </Grid>
 </UserControl>

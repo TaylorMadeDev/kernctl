@@ -11,7 +11,6 @@ namespace Kernctl.App.ViewModels;
 public sealed class MainWindowViewModel : ObservableObject
 {
     private readonly Dictionary<string, object> pages;
-    private readonly IReadOnlyList<SearchResultViewModel> searchIndex;
     private NavigationItemViewModel selectedNavigation;
     private object currentPage;
     private string searchQuery = string.Empty;
@@ -75,19 +74,6 @@ public sealed class MainWindowViewModel : ObservableObject
         selectedNavigation = NavigationItems.Single(item => item.Title == "Gaming");
         currentPage = pages[selectedNavigation.Title];
 
-        searchIndex =
-        [
-            .. NavigationItems.Select(item => new SearchResultViewModel(
-                item.Title,
-                "Destination",
-                item.Title,
-                $"{item.Title} {item.Description}")),
-            .. Gaming.Tools.Select(tool => new SearchResultViewModel(
-                tool.Title,
-                "Gaming tool",
-                "Gaming",
-                $"{tool.Title} {tool.Description} Gaming")),
-        ];
     }
 
     public IReadOnlyList<NavigationItemViewModel> NavigationItems { get; }
@@ -177,6 +163,7 @@ public sealed class MainWindowViewModel : ObservableObject
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
         await Gaming.InitializeAsync(cancellationToken);
+        RefreshSearchResults();
         if (ActionRecovery is not null)
         {
             await ActionRecovery.InitializeAsync(cancellationToken);
@@ -218,6 +205,7 @@ public sealed class MainWindowViewModel : ObservableObject
         }
 
         NavigateTo(result.DestinationTitle);
+        result.Activation?.Invoke();
         SearchQuery = string.Empty;
         CloseSearch();
     }
@@ -250,7 +238,7 @@ public sealed class MainWindowViewModel : ObservableObject
             ' ',
             StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-        foreach (var result in searchIndex.Where(result =>
+        foreach (var result in BuildSearchIndex().Where(result =>
                      terms.Length == 0
                      || terms.All(term => result.SearchText.Contains(
                          term,
@@ -262,6 +250,39 @@ public sealed class MainWindowViewModel : ObservableObject
         SelectedSearchResult = SearchResults.FirstOrDefault();
         OnPropertyChanged(nameof(IsSearchOpen));
     }
+
+    private IReadOnlyList<SearchResultViewModel> BuildSearchIndex() =>
+    [
+        .. NavigationItems.Select(item => new SearchResultViewModel(
+            item.Title,
+            "Destination",
+            item.Title,
+            $"{item.Title} {item.Description}")),
+        .. Gaming.Tools.Select(tool => new SearchResultViewModel(
+            tool.Title,
+            "Gaming tool",
+            "Gaming",
+            $"{tool.Title} {tool.Description} Gaming",
+            () => tool.Command?.Execute(null))),
+        .. Gaming.Games.Select(game => new SearchResultViewModel(
+            $"{game.Name} — details",
+            $"Game details · {game.Source}",
+            "Gaming",
+            $"{game.Name} details game {game.Source}",
+            () => Gaming.OpenGameDetails(game.Id))),
+        .. Gaming.Games.Where(game => game.CanLaunch).Select(game => new SearchResultViewModel(
+            $"Launch {game.Name}",
+            "Game launch · confirmation required",
+            "Gaming",
+            $"{game.Name} launch play game {game.Source}",
+            () => Gaming.RequestGameLaunch(game.Id))),
+        .. (Profiles?.Profiles ?? []).Select(profile => new SearchResultViewModel(
+            $"Apply {profile.Name}",
+            "Profile action · review required",
+            "Gaming",
+            $"{profile.Name} profile apply review",
+            () => Profiles?.OpenCommand.Execute(null))),
+    ];
 
     private void DiscardThemeChanges()
     {
